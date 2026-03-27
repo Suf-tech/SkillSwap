@@ -14,9 +14,9 @@ public class MyRequestsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_requests);
 
+        // Ab ye line error nahi degi kyunke XML mein ID set ho gayi hai
         listView = findViewById(R.id.requestsListView);
 
-        // Static Dummy Data
         String[] requests = {
                 "Learn Java - Status: Pending",
                 "Learn Photoshop - Status: Accepted",

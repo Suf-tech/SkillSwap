@@ -33,10 +33,9 @@ public class RequestActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Request Sent Successfully!", Toast.LENGTH_LONG).show();
 
-                // Form submit hone ke baad My Requests screen par jana
                 Intent intent = new Intent(RequestActivity.this, MyRequestsActivity.class);
                 startActivity(intent);
-                finish(); // Taake back karne pe form dobara na khule
+                finish();
             }
         });
     }

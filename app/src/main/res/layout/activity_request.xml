@@ -14,41 +14,39 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Request Skill Swap"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="15dp"/>
 
         <EditText
             android:id="@+id/reqName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Your Full Name"
+            android:hint="Your Name"
             android:inputType="textPersonName" />
 
         <EditText
             android:id="@+id/reqSkillOffered"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:hint="Skill You Can Offer (In Return)"
+            android:layout_marginTop="10dp"
+            android:hint="Your Skill"
             android:inputType="text" />
 
         <EditText
             android:id="@+id/reqMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:hint="Message for Teacher"
-            android:gravity="top"
-            android:lines="4"
+            android:layout_marginTop="10dp"
+            android:hint="Message"
             android:inputType="textMultiLine" />
 
         <Button
             android:id="@+id/submitBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:text="Send Swap Request" />
+            android:layout_marginTop="20dp"
+            android:text="Send Request" />
 
     </LinearLayout>
 </ScrollView>
