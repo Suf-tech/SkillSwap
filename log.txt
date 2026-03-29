@@ -1,0 +1,86 @@
+Java Source Files (20 Files)
+Path: app/src/main/java/com/example/skillswap/
+
+AddPostActivity.java: Logic to create and save a new skill swap post.
+
+DatabaseHelper.java: SQLite Database handler (Users, Posts, and Requests tables).
+
+DetailActivity.java: Handles post details and sending swap requests.
+
+EditPostActivity.java: Logic for users to modify their existing posts.
+
+ForgetPasswordActivity.java: Logic for resetting account passwords.
+
+HomeActivity.java: The Dashboard controller with RecyclerView and BottomNav.
+
+IdentityActivity.java: Displays user stats and digital ID card.
+
+LoginActivity.java: Handles user login and session management.
+
+MainActivity.java: Root activity (often used for redirection).
+
+MyRequestsActivity.java: Specifically handles the user's sent/received requests.
+
+PersonalInfoActivity.java: Logic to update profile name, pass, and avatar.
+
+ProfileActivity.java: User account overview and logout logic.
+
+RequestActivity.java: List controller for swap requests.
+
+RequestAdapter.java: Bridge for the Request ListView (Accept/Reject logic).
+
+RequestModel.java: Data object for Request information.
+
+SignupActivity.java: New user registration logic.
+
+Skill.java: Data object for Skill Post information.
+
+SkillAdapter.java: Bridge for the Dashboard RecyclerView.
+
+SkillSelectionActivity.java: First-time profile setup (Avatar & Skills).
+
+SplashActivity.java: The very first screen (Loading/Logo).
+
+🎨 2. Layout XML Files (16 Files)
+Path: app/src/main/res/layout/
+
+activity_add_post.xml: UI for creating a post.
+
+activity_detail.xml: UI for viewing post details.
+
+activity_forget_password.xml: UI for password reset.
+
+activity_home.xml: Main dashboard layout.
+
+activity_identity.xml: Digital ID card design.
+
+activity_login.xml: Login screen interface.
+
+activity_main.xml: Root layout file.
+
+activity_my_requests.xml: Specific layout for request management.
+
+activity_personal_info.xml: Profile edit form + Avatar selection.
+
+activity_profile.xml: Account summary screen.
+
+activity_request.xml: Requests list container.
+
+activity_signup.xml: Registration form design.
+
+activity_skill_selection.xml: Initial setup screen UI.
+
+activity_splash.xml: Logo and branding layout.
+
+request_item.xml: Design for a single request row (CardView).
+
+skill_item.xml: Design for a single skill post card.
+
+📂 3. Other Essential Files
+AndroidManifest.xml: Registers all 20 activities and app permissions.
+
+drawable/: Contains all 6 avatars (avatar_f1-f3, avatar_m1-m3) and editbox_background.xml.
+
+menu/bottom_nav_menu.xml: Icons and labels for the bottom navigation bar.
+
+values/themes.xml: Global Light Theme settings.

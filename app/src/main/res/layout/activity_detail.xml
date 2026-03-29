@@ -1,30 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp"
-    android:gravity="center_horizontal">
+    android:background="#FFFFFF">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/teacher"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textSize="18sp" />
-
-    <Button
-        android:id="@+id/requestBtn"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:text="Request Swap" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/teacherImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:background="@drawable/editbox_background"
+            android:padding="5dp" />
+
+        <TextView
+            android:id="@+id/teacher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#000000" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Skill you want from them:"
+            android:layout_marginTop="25dp"
+            android:textColor="#2196F3"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/reqSkill"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/editbox_background"
+            android:textColor="#000000"
+            android:padding="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Skill you will give in return:"
+            android:layout_marginTop="15dp"
+            android:textColor="#2196F3"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/offerSkill"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/editbox_background"
+            android:textColor="#000000"
+            android:padding="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your Message:"
+            android:layout_marginTop="15dp"
+            android:textColor="#2196F3"
+            android:textStyle="bold"/>
+
+        <EditText
+            android:id="@+id/swapMsg"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@drawable/editbox_background"
+            android:textColor="#000000"
+            android:padding="12dp"
+            android:gravity="top" />
+
+        <Button
+            android:id="@+id/requestBtn"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="30dp"
+            android:backgroundTint="#2196F3"
+            android:text="Send Swap Request" />
+    </LinearLayout>
+</ScrollView>

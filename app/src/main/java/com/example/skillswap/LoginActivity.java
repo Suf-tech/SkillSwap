@@ -1,46 +1,66 @@
 package com.example.skillswap;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
-import android.widget.*;
-
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
     EditText email, password;
     Button loginBtn;
-    TextView signupText;
+    TextView signupText, forgetPass;
+    DatabaseHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        db = new DatabaseHelper(this);
+
+        // Mapping IDs (Ab XML mein ye IDs maujood hain)
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         loginBtn = findViewById(R.id.loginBtn);
         signupText = findViewById(R.id.signupText);
+        forgetPass = findViewById(R.id.forgetPass);
 
         loginBtn.setOnClickListener(v -> {
+            String inputEmail = email.getText().toString().trim();
+            String inputPass = password.getText().toString().trim();
 
-            String e = email.getText().toString();
-            String p = password.getText().toString();
-
-            if (TextUtils.isEmpty(e) || TextUtils.isEmpty(p)) {
-                Toast.makeText(this, "All fields required", Toast.LENGTH_SHORT).show();
+            if (TextUtils.isEmpty(inputEmail) || TextUtils.isEmpty(inputPass)) {
+                Toast.makeText(this, "Please enter all details!", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show();
+                // Database check call
+                boolean checkUserPass = db.checkEmailPassword(inputEmail, inputPass);
 
-                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                startActivity(intent);
+                if (checkUserPass) {
+                    // Save Session
+                    getSharedPreferences("UserSession", MODE_PRIVATE)
+                            .edit()
+                            .putString("user_email", inputEmail)
+                            .apply();
+
+                    Toast.makeText(this, "Welcome Back!", Toast.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(this, "Invalid Email or Password!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-        signupText.setOnClickListener(v -> {
-           startActivity(new Intent(LoginActivity.this, SignupActivity.class));
-        });
+        // Click listeners for navigation
+        signupText.setOnClickListener(v -> startActivity(new Intent(this, SignupActivity.class)));
+        forgetPass.setOnClickListener(v -> startActivity(new Intent(this, ForgetPasswordActivity.class)));
     }
 }

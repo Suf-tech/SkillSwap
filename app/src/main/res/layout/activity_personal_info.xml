@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Personal Information"
+            android:textColor="#2196F3"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/currentSelectedAv"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/editbox_background"
+            android:padding="5dp"
+            android:src="@drawable/editbox_background" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="Tap below to change avatar"
+            android:textColor="#757575"
+            android:textSize="12sp" />
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:columnCount="3">
+
+            <ImageView android:id="@+id/av1" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m1" android:background="@drawable/editbox_background" android:padding="3dp"/>
+            <ImageView android:id="@+id/av2" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m2" android:background="@drawable/editbox_background" android:padding="3dp"/>
+            <ImageView android:id="@+id/av3" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m3" android:background="@drawable/editbox_background" android:padding="3dp"/>
+            <ImageView android:id="@+id/av4" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f1" android:background="@drawable/editbox_background" android:padding="3dp"/>
+            <ImageView android:id="@+id/av5" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f2" android:background="@drawable/editbox_background" android:padding="3dp"/>
+            <ImageView android:id="@+id/av6" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f3" android:background="@drawable/editbox_background" android:padding="3dp"/>
+        </GridLayout>
+
+        <EditText
+            android:id="@+id/editName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/editbox_background"
+            android:hint="Full Name"
+            android:padding="12dp"
+            android:textColor="#000000" />
+
+        <EditText
+            android:id="@+id/editEmail"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/editbox_background"
+            android:padding="12dp"
+            android:textColor="#757575" />
+
+        <EditText
+            android:id="@+id/editPass"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/editbox_background"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/btnUpdateInfo"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="30dp"
+            android:backgroundTint="#2196F3"
+            android:text="Update Profile"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+</ScrollView>

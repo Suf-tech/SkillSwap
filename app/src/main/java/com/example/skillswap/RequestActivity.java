@@ -1,42 +1,58 @@
 package com.example.skillswap;
 
-import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
+import java.util.ArrayList;
 
 public class RequestActivity extends AppCompatActivity {
-
-    EditText name, skillOffered, message;
-    Button submitBtn;
+    ListView requestListView;
+    DatabaseHelper db;
+    ArrayList<RequestModel> requestList;
+    RequestAdapter adapter;
+    String currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request);
 
-        name = findViewById(R.id.reqName);
-        skillOffered = findViewById(R.id.reqSkillOffered);
-        message = findViewById(R.id.reqMessage);
-        submitBtn = findViewById(R.id.submitBtn);
+        // Mapping ID from XML
+        requestListView = findViewById(R.id.requestListView);
+        db = new DatabaseHelper(this);
 
-        submitBtn.setOnClickListener(v -> {
-            String n = name.getText().toString();
-            String s = skillOffered.getText().toString();
-            String m = message.getText().toString();
+        SharedPreferences sp = getSharedPreferences("UserSession", MODE_PRIVATE);
+        currentUser = sp.getString("user_email", "");
 
-            if (TextUtils.isEmpty(n) || TextUtils.isEmpty(s) || TextUtils.isEmpty(m)) {
-                Toast.makeText(this, "Please fill all form fields", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Request Sent Successfully!", Toast.LENGTH_LONG).show();
+        loadRequests();
+    }
 
-                Intent intent = new Intent(RequestActivity.this, MyRequestsActivity.class);
-                startActivity(intent);
-                finish();
+    public void loadRequests() {
+        requestList = new ArrayList<>();
+        // Make sure 'getMyRequests' method exists in your DatabaseHelper
+        Cursor cursor = db.getMyRequests(currentUser);
+
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                do {
+                    requestList.add(new RequestModel(
+                            cursor.getInt(0),      // ID
+                            cursor.getString(1),   // Sender
+                            cursor.getString(2),   // Receiver
+                            cursor.getString(3),   // Skill Offered
+                            cursor.getString(4),   // Skill Required
+                            cursor.getString(5),   // Message
+                            cursor.getString(6)    // Status
+                    ));
+                } while (cursor.moveToNext());
             }
-        });
+            cursor.close();
+        }
+
+        // Initializing Adapter
+        adapter = new RequestAdapter(this, requestList, currentUser);
+        requestListView.setAdapter(adapter);
     }
 }
