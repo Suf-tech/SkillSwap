@@ -19,9 +19,9 @@
         <activity android:name=".LoginActivity" android:exported="false" />
         <activity android:name=".SignupActivity" android:exported="false" />
         <activity android:name=".HomeActivity" android:exported="false" />
-        <activity android:name=".AddPostActivity" android:exported="false" />
-        <activity android:name=".ProfileActivity" android:exported="false" />
-        <activity android:name=".RequestActivity" android:exported="false" />
+
+
+
         <activity android:name=".DetailActivity" android:exported="false" />
         <activity android:name=".SkillSelectionActivity" android:exported="false" />
         <activity android:name=".PersonalInfoActivity" android:exported="false" />
@@ -31,6 +31,7 @@
             android:exported="false"
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".ForgetPasswordActivity" android:exported="false" />
+        <activity android:name=".ChatActivity" />
     </application>
 
 </manifest>

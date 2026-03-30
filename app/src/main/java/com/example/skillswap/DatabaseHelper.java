@@ -11,15 +11,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DBNAME = "SkillSwap.db";
 
     public DatabaseHelper(Context context) {
-        // Version 4 hi rehne dein taake existing data na ure
-        super(context, DBNAME, null, 4);
+        super(context, DBNAME, null, 6);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create Table users(email TEXT primary key, name TEXT, password TEXT, avatar_id INTEGER DEFAULT 0)");
-        db.execSQL("create Table requests(id INTEGER PRIMARY KEY AUTOINCREMENT, sender_email TEXT, receiver_email TEXT, skill_offered TEXT, skill_required TEXT, message TEXT, status TEXT DEFAULT 'Pending')");
-        db.execSQL("create Table posts(id INTEGER PRIMARY KEY AUTOINCREMENT, user_email TEXT, user_name TEXT, skill_have TEXT, skill_want TEXT, message TEXT, avatar_id INTEGER)");
+        db.execSQL("create Table users(email TEXT primary key, name TEXT, password TEXT, avatar_id INTEGER DEFAULT 0, rating_sum REAL DEFAULT 0, rating_count INTEGER DEFAULT 0)");
+        db.execSQL("create Table requests(id INTEGER PRIMARY KEY AUTOINCREMENT, post_id INTEGER, sender_email TEXT, receiver_email TEXT, skill_offered TEXT, skill_required TEXT, message TEXT, status TEXT DEFAULT 'Pending', sender_rated INTEGER DEFAULT 0, receiver_rated INTEGER DEFAULT 0)");
+        db.execSQL("create Table posts(id INTEGER PRIMARY KEY AUTOINCREMENT, user_email TEXT, user_name TEXT, skill_have TEXT, skill_want TEXT, message TEXT, avatar_id INTEGER, post_status TEXT DEFAULT 'Open')");
+        db.execSQL("create Table messages(id INTEGER PRIMARY KEY AUTOINCREMENT, request_id INTEGER, sender_email TEXT, receiver_email TEXT, message_text TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
     }
 
     @Override
@@ -27,6 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("drop Table if exists users");
         db.execSQL("drop Table if exists requests");
         db.execSQL("drop Table if exists posts");
+        db.execSQL("drop Table if exists messages");
         onCreate(db);
     }
 
@@ -75,7 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.update("users", cv, "email = ?", new String[]{email}) > 0;
     }
 
-    // --- 2. PROFILE & AVATAR METHODS ---
+    // --- 2. PROFILE, AVATAR & RATINGS METHODS ---
     public String getUserName(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("Select name from users where email = ?", new String[]{email});
@@ -107,12 +108,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.update("users", cv, "email = ?", new String[]{email}) > 0;
     }
 
-    // --- NEW: FULL PROFILE UPDATE METHOD ---
     public boolean updateFullProfile(String email, String name, String password, int avatarId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("name", name);
-        // Agar password box khali nahi hai to hi update karein
         if (password != null && !password.isEmpty()) {
             cv.put("password", password);
         }
@@ -120,7 +119,42 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.update("users", cv, "email = ?", new String[]{email}) > 0;
     }
 
-    // --- 3. POSTS (ADD, EDIT, DELETE, GET) METHODS ---
+    public boolean rateUser(String email, float newRating) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("Select rating_sum, rating_count from users where email = ?", new String[]{email});
+        if (cursor.moveToFirst()) {
+            float currentSum = cursor.getFloat(0);
+            int currentCount = cursor.getInt(1);
+
+            ContentValues cv = new ContentValues();
+            cv.put("rating_sum", currentSum + newRating);
+            cv.put("rating_count", currentCount + 1);
+
+            cursor.close();
+            return db.update("users", cv, "email = ?", new String[]{email}) > 0;
+        }
+        cursor.close();
+        return false;
+    }
+
+    public String getUserRating(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("Select rating_sum, rating_count from users where email = ?", new String[]{email});
+        if (cursor.moveToFirst()) {
+            float sum = cursor.getFloat(0);
+            int count = cursor.getInt(1);
+            cursor.close();
+
+            if (count == 0) return "No Ratings Yet";
+
+            float average = sum / count;
+            return String.format("%.1f (%d reviews)", average, count);
+        }
+        cursor.close();
+        return "No Ratings Yet";
+    }
+
+    // --- 3. POSTS METHODS ---
     public boolean addPost(String email, String name, String have, String want, String msg, int avatar) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -130,9 +164,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put("skill_want", want);
         cv.put("message", msg);
         cv.put("avatar_id", avatar);
+        cv.put("post_status", "Open");
         return db.insert("posts", null, cv) != -1;
     }
 
+    // THE RESTORED METHOD
     public boolean updatePost(int id, String have, String want, String msg) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -142,14 +178,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.update("posts", cv, "id = ?", new String[]{String.valueOf(id)}) > 0;
     }
 
+    public boolean closePost(int postId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("post_status", "Closed");
+        return db.update("posts", cv, "id = ?", new String[]{String.valueOf(postId)}) > 0;
+    }
+
     public boolean deletePost(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
+        // Cleans up associated requests when a post is deleted
+        db.delete("requests", "post_id = ?", new String[]{String.valueOf(id)});
         return db.delete("posts", "id = ?", new String[]{String.valueOf(id)}) > 0;
     }
 
-    public Cursor getAllPosts() {
+    public Cursor getAllOpenPosts() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("Select * from posts ORDER BY id DESC", null);
+        return db.rawQuery("Select * from posts WHERE post_status = 'Open' ORDER BY id DESC", null);
     }
 
     public Cursor getPostById(int id) {
@@ -158,16 +203,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // --- 4. REQUEST METHODS ---
-    public boolean updateRequestStatus(int id, String newStatus) {
+    public boolean sendRequest(int postId, String sender, String receiver, String offered, String required, String msg) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put("status", newStatus);
-        return db.update("requests", cv, "id = ?", new String[]{String.valueOf(id)}) > 0;
-    }
-
-    public boolean sendRequest(String sender, String receiver, String offered, String required, String msg) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues cv = new ContentValues();
+        cv.put("post_id", postId);
         cv.put("sender_email", sender);
         cv.put("receiver_email", receiver);
         cv.put("skill_offered", offered);
@@ -177,8 +216,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert("requests", null, cv) != -1;
     }
 
+    public boolean updateRequestStatus(int id, String newStatus) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("status", newStatus);
+        return db.update("requests", cv, "id = ?", new String[]{String.valueOf(id)}) > 0;
+    }
+
+    public boolean markAsRated(int requestId, boolean isSender) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        if (isSender) cv.put("sender_rated", 1);
+        else cv.put("receiver_rated", 1);
+        return db.update("requests", cv, "id = ?", new String[]{String.valueOf(requestId)}) > 0;
+    }
+
     public Cursor getMyRequests(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("Select * from requests where sender_email = ? OR receiver_email = ? ORDER BY id DESC", new String[]{email, email});
+    }
+
+    // --- 5. CHAT METHODS ---
+    public boolean insertMessage(int requestId, String sender, String receiver, String text) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("request_id", requestId);
+        cv.put("sender_email", sender);
+        cv.put("receiver_email", receiver);
+        cv.put("message_text", text);
+        return db.insert("messages", null, cv) != -1;
+    }
+
+    public Cursor getChatHistory(int requestId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM messages WHERE request_id = ? ORDER BY id ASC", new String[]{String.valueOf(requestId)});
     }
 }

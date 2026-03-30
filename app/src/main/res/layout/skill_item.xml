@@ -5,9 +5,11 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="12dp"
     android:layout_marginVertical="8dp"
-    app:cardCornerRadius="15dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="#FFFFFF">
+    app:cardBackgroundColor="#EFF6FF"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#BBDEFB"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,58 +17,98 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <ImageView
                 android:id="@+id/userImage"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/editbox_background" />
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:src="@drawable/editbox_background"
+                android:background="@drawable/editbox_background"
+                android:padding="3dp" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/userImage"
-                android:layout_marginStart="12dp"
-                android:orientation="vertical">
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
 
                 <TextView
                     android:id="@+id/teacher"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="User Name"
-                    android:textColor="#000000"
-                    android:textSize="18sp"
+                    android:textColor="#333333"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Offering a swap"
+                    android:textColor="#757575"
+                    android:textSize="12sp" />
             </LinearLayout>
-        </RelativeLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D1E4F9"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Offers:"
+            android:text="I CAN TEACH:"
             android:textColor="#2196F3"
-            android:textSize="12sp"
+            android:textSize="10sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Skill Offered"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="#000000"
-            android:textSize="14sp" />
+            android:text="I WANT TO LEARN:"
+            android:textColor="#FF9800"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/wantSkill"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Skill Required"
+            android:textColor="#424242"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"/>
 
         <Button
             android:id="@+id/viewProfileBtn"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="#2196F3"
+            android:layout_height="45dp"
+            android:backgroundTint="#FFFFFF"
+            android:textColor="#2196F3"
             android:text="View Details"
-            android:textAllCaps="false" />
+            android:textAllCaps="false"
+            android:textSize="14sp"
+            app:strokeColor="#2196F3"
+            app:strokeWidth="1dp" />
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -29,11 +29,26 @@ public class SkillAdapter extends RecyclerView.Adapter<SkillAdapter.ViewHolder> 
         this.currentUserEmail = sp.getString("user_email", "");
     }
 
+    public void setFilteredList(ArrayList<Skill> filteredList) {
+        this.list = filteredList;
+        notifyDataSetChanged();
+    }
+
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Skill skill = list.get(position);
+
         holder.title.setText(skill.getTitle());
         holder.teacher.setText(skill.getTeacher());
+
+        android.database.Cursor cursor = db.getPostById(skill.getId());
+        if(cursor != null && cursor.moveToFirst()){
+            holder.wantSkill.setText(cursor.getString(4));
+            cursor.close();
+        } else {
+            holder.wantSkill.setText("Open to offers");
+        }
+
         setAvatar(holder.userImage, skill.getAvatarId());
 
         if (skill.getEmail().equalsIgnoreCase(currentUserEmail)) {
@@ -43,14 +58,12 @@ public class SkillAdapter extends RecyclerView.Adapter<SkillAdapter.ViewHolder> 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Post Options");
                 builder.setItems(options, (dialog, which) -> {
-                    if (which == 0) { // Edit Post Logic
+                    if (which == 0) {
                         Intent intent = new Intent(context, EditPostActivity.class);
-                        // FIXED: Pass correct data to Edit screen
                         intent.putExtra("postId", skill.getId());
                         intent.putExtra("have", skill.getTitle());
-                        // Note: If your Skill model has want/msg, pass them here
                         context.startActivity(intent);
-                    } else { // Delete Post Logic
+                    } else {
                         if (db.deletePost(skill.getId())) {
                             list.remove(position);
                             notifyItemRemoved(position);
@@ -65,6 +78,7 @@ public class SkillAdapter extends RecyclerView.Adapter<SkillAdapter.ViewHolder> 
             holder.viewDetails.setText("View Details");
             holder.viewDetails.setOnClickListener(v -> {
                 Intent intent = new Intent(context, DetailActivity.class);
+                intent.putExtra("postId", skill.getId()); // FIX: Passing the ID
                 intent.putExtra("email", skill.getEmail());
                 intent.putExtra("title", skill.getTitle());
                 intent.putExtra("teacher", skill.getTeacher());
@@ -85,7 +99,7 @@ public class SkillAdapter extends RecyclerView.Adapter<SkillAdapter.ViewHolder> 
     public int getItemCount() { return list.size(); }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView title, teacher;
+        TextView title, teacher, wantSkill;
         Button viewDetails;
         ImageView userImage;
 
@@ -93,6 +107,7 @@ public class SkillAdapter extends RecyclerView.Adapter<SkillAdapter.ViewHolder> 
             super(itemView);
             title = itemView.findViewById(R.id.title);
             teacher = itemView.findViewById(R.id.teacher);
+            wantSkill = itemView.findViewById(R.id.wantSkill);
             viewDetails = itemView.findViewById(R.id.viewProfileBtn);
             userImage = itemView.findViewById(R.id.userImage);
         }
