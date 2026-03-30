@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#FFFFFF"> <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Edit Your Post"
+    android:textSize="22sp"
+    android:textStyle="bold"
+    android:textColor="#2196F3"
+    android:layout_marginBottom="20dp"/>
+
+    <EditText
+        android:id="@+id/editPostHave"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/editbox_background"
+        android:hint="Skill you have"
+        android:padding="12dp"
+        android:textColor="#000000" />
+
+    <EditText
+        android:id="@+id/editPostWant"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/editbox_background"
+        android:hint="Skill you want"
+        android:padding="12dp"
+        android:textColor="#000000" />
+
+    <EditText
+        android:id="@+id/editPostMsg"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/editbox_background"
+        android:hint="Message"
+        android:gravity="top"
+        android:padding="12dp"
+        android:textColor="#000000" />
+
+    <Button
+        android:id="@+id/btnUpdatePost"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="#2196F3"
+        android:text="Save Changes"
+        android:textColor="#FFFFFF" />
+
+    <Button
+        android:id="@+id/btnDeletePost"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="#F44336"
+        android:text="Delete Post"
+        android:textColor="#FFFFFF" />
+
+</LinearLayout>

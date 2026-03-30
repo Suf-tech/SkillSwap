@@ -39,19 +39,22 @@ public class SkillAdapter extends RecyclerView.Adapter<SkillAdapter.ViewHolder> 
         if (skill.getEmail().equalsIgnoreCase(currentUserEmail)) {
             holder.viewDetails.setText("Edit / Delete");
             holder.viewDetails.setOnClickListener(v -> {
-                // Show Dialog for Options
                 CharSequence options[] = new CharSequence[] {"Edit Post", "Delete Post"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Post Options");
                 builder.setItems(options, (dialog, which) -> {
-                    if (which == 0) { // Edit
+                    if (which == 0) { // Edit Post Logic
                         Intent intent = new Intent(context, EditPostActivity.class);
-                        intent.putExtra("post_id", skill.getId());
+                        // FIXED: Pass correct data to Edit screen
+                        intent.putExtra("postId", skill.getId());
+                        intent.putExtra("have", skill.getTitle());
+                        // Note: If your Skill model has want/msg, pass them here
                         context.startActivity(intent);
-                    } else { // Delete
+                    } else { // Delete Post Logic
                         if (db.deletePost(skill.getId())) {
                             list.remove(position);
-                            notifyDataSetChanged();
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, list.size());
                             Toast.makeText(context, "Post Deleted", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -71,17 +74,21 @@ public class SkillAdapter extends RecyclerView.Adapter<SkillAdapter.ViewHolder> 
         }
     }
 
-    // ... baki ViewHolder aur setAvatar same rahenge ...
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.skill_item, parent, false);
         return new ViewHolder(view);
     }
+
     @Override
     public int getItemCount() { return list.size(); }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView title, teacher; Button viewDetails; ImageView userImage;
+        TextView title, teacher;
+        Button viewDetails;
+        ImageView userImage;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
@@ -90,6 +97,7 @@ public class SkillAdapter extends RecyclerView.Adapter<SkillAdapter.ViewHolder> 
             userImage = itemView.findViewById(R.id.userImage);
         }
     }
+
     private void setAvatar(ImageView iv, int id) {
         int res = R.drawable.editbox_background;
         if (id == 1) res = R.drawable.avatar_m1;

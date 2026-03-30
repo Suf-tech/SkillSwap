@@ -26,6 +26,10 @@
         <activity android:name=".SkillSelectionActivity" android:exported="false" />
         <activity android:name=".PersonalInfoActivity" android:exported="false" />
         <activity android:name=".IdentityActivity" android:exported="false" />
+        <activity
+            android:name=".EditPostActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".ForgetPasswordActivity" android:exported="false" />
     </application>
 
