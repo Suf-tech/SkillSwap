@@ -236,6 +236,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("Select * from requests where sender_email = ? OR receiver_email = ? ORDER BY id DESC", new String[]{email, email});
     }
 
+    public boolean deleteRequest(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete("requests", "id = ?", new String[]{String.valueOf(id)}) > 0;
+    }
+
     // --- 5. CHAT METHODS ---
     public boolean insertMessage(int requestId, String sender, String receiver, String text) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -261,6 +266,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getSkillOfferedStats() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT skill_have, COUNT(*) as cnt FROM posts GROUP BY skill_have", null);
+    }
+
+    public Cursor getAllUsers() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT email, name, avatar_id FROM users ORDER BY name COLLATE NOCASE", null);
+    }
+
+    public Cursor getPostsByUser(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT id, skill_have, skill_want, message, post_status FROM posts WHERE user_email = ? ORDER BY id DESC", new String[]{email});
+    }
+
+    public Cursor getRequestsByUser(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT id, post_id, sender_email, receiver_email, skill_offered, skill_required, message, status FROM requests WHERE sender_email = ? OR receiver_email = ? ORDER BY id DESC", new String[]{email, email});
     }
 
     public int getTotalOpenPosts() {

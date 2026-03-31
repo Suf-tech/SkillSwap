@@ -72,7 +72,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     // Overview is current screen
                     return true;
                 } else if (id == R.id.nav_admin_users) {
-                    Toast.makeText(AdminDashboardActivity.this, "Users (dummy)", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(AdminDashboardActivity.this, AdminUsersActivity.class));
                     return true;
                 } else if (id == R.id.nav_admin_reports) {
                     Toast.makeText(AdminDashboardActivity.this, "Reports (dummy)", Toast.LENGTH_SHORT).show();
