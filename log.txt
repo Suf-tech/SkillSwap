@@ -84,3 +84,35 @@ drawable/: Contains all 6 avatars (avatar_f1-f3, avatar_m1-m3) and editbox_backg
 menu/bottom_nav_menu.xml: Icons and labels for the bottom navigation bar.
 
 values/themes.xml: Global Light Theme settings.
+
+# Skill Swap - Comprehensive Changelog
+Date: March 30, 2026
+
+## [Unreleased] - Major Architecture & Feature Update
+
+### Added
+- **ViewPager2 Architecture:** Implemented a swipeable, fragment-based architecture (`HomeFragment`, `RequestsFragment`, `AddPostFragment`, `ProfileFragment`) to support a persistent Bottom Navigation Bar.
+- **In-App Messaging System:** Created a dedicated `ChatActivity` with dynamic left/right message bubbles (`ChatAdapter`, `item_chat_message.xml`). Chats are strictly isolated to specific swap sessions using `request_id`.
+- **User Rating System:** Added the ability to rate a swap partner (1-5 stars) via an interactive `AlertDialog`. Ratings are permanently saved and displayed on the user's Profile tab.
+- **Live Search Functionality:** Added a real-time Search Bar to the Dashboard (`HomeFragment`) that filters posts based on both what users are offering (`skill_have`) and what they want in return (`skill_want`).
+- **Glassmorphism UI Upgrade:** Modernized `skill_item.xml` and `activity_detail.xml` using bento-grid layouts, frosted glass effects, and ice-blue color palettes for a premium feel.
+- **"Complete Swap" Lifecycle:** Introduced a definitive end-state for transactions. Swap requests now flow from `Pending` -> `Accepted` -> `Completed`.
+- **Relational Database Bonds (V6):** Upgraded SQLite schema to strictly link `requests` to specific `posts` (via `post_id`), and `messages` to specific `requests` (via `request_id`).
+
+### Changed
+- **Dashboard Data Visibility:** Upgraded `SkillAdapter` to expose the `skill_want` data directly on the dashboard cards, saving users from clicking into every post to see what is required.
+- **Request UI Dynamism:** Overhauled `RequestAdapter`. Action buttons (Accept, Reject, Chat, Complete, Rate) now dynamically appear or hide based on whether the user is the sender or receiver, and what the current status of the swap is.
+- **Chat State Management:** Once a swap is marked as "Completed", the associated chat room automatically locks and becomes read-only.
+- **Database Helper Overhaul:** Incremented DB version from 4 to 6. Added new tables (`messages`) and new columns (`rating_sum`, `rating_count`, `post_id`, `request_id`, `post_status`, `sender_rated`, `receiver_rated`).
+
+### Fixed
+- **Bottom Navigation Disappearance:** Solved the core issue where launching new Activities covered the `BottomNavigationView`. It is now securely hosted in `HomeActivity`.
+- **The "Ghost Post" Bug:** Posts now correctly update their `post_status` to "Closed" and vanish from the public dashboard the moment a swap request is "Accepted".
+- **The "Chat History Loop" Bug:** Chat histories no longer infinitely merge if two users conduct multiple different swaps over time; they are now isolated by transaction.
+- **The "Infinite Ratings" Bug:** Added a database lock (`sender_rated` / `receiver_rated`) that permanently hides the "Rate User" button once a rating is submitted for a specific transaction.
+- **The "Orphaned Request" Bug:** Implemented cascade deletion logic. If a user deletes their post from the dashboard, all pending swap requests associated with that specific post are automatically deleted.
+- **Missing Models & Methods:** Restored missing `updateAvatar`, `updatePost`, and added the missing `setStatus` method to `RequestModel`.
+
+### Removed / Deprecated
+- **Standalone Tab Activities:** `RequestActivity.java`, `AddPostActivity.java`, and `ProfileActivity.java` (along with their Manifest declarations) have been entirely replaced by Fragments.
+- **Direct Intent Routing:** Removed direct `startActivity()` calls from the bottom navigation menu in favor of `ViewPager2.setCurrentItem()`.

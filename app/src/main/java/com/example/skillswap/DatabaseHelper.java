@@ -251,4 +251,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM messages WHERE request_id = ? ORDER BY id ASC", new String[]{String.valueOf(requestId)});
     }
+
+    // --- 6. ADMIN DASHBOARD STATS ---
+    public Cursor getSkillRequestedStats() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT skill_want, COUNT(*) as cnt FROM posts GROUP BY skill_want", null);
+    }
+
+    public Cursor getSkillOfferedStats() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT skill_have, COUNT(*) as cnt FROM posts GROUP BY skill_have", null);
+    }
+
+    public int getTotalOpenPosts() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM posts WHERE post_status = 'Open'", null);
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
+    }
+
+    public int getTotalRequests() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM requests", null);
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
+    }
+
+    public int getTotalUsers() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM users", null);
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        return count;
+    }
+
+    public Cursor getTopRequestedSkills(int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT skill_want, COUNT(*) as cnt FROM posts GROUP BY skill_want ORDER BY cnt DESC LIMIT " + limit, null);
+    }
+
+    public Cursor getTopOfferedSkills(int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT skill_have, COUNT(*) as cnt FROM posts GROUP BY skill_have ORDER BY cnt DESC LIMIT " + limit, null);
+    }
 }
