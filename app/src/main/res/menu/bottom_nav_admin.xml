@@ -9,9 +9,9 @@
         android:icon="@android:drawable/ic_menu_myplaces"
         android:title="Users" />
     <item
-        android:id="@+id/nav_admin_reports"
+        android:id="@+id/nav_admin_skills"
         android:icon="@android:drawable/ic_menu_sort_by_size"
-        android:title="Reports" />
+        android:title="Skills" />
     <item
         android:id="@+id/nav_admin_settings"
         android:icon="@android:drawable/ic_menu_manage"

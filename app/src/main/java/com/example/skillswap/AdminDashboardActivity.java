@@ -33,8 +33,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_admin_users) {
                     switchFragment(new AdminUsersFragment());
                     return true;
-                } else if (id == R.id.nav_admin_reports) {
-                    switchFragment(new AdminReportsFragment());
+                } else if (id == R.id.nav_admin_skills) {
+                    switchFragment(new AdminSkillsFragment());
                     return true;
                 } else if (id == R.id.nav_admin_settings) {
                     switchFragment(new AdminSettingsFragment());
@@ -63,5 +63,3 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 .commit();
     }
 }
-
-
