@@ -258,19 +258,83 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // --- 6. ADMIN DASHBOARD STATS ---
+    public int getTotalOpenPosts() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT COUNT(*) FROM posts WHERE post_status = 'Open'", null);
+        int count = 0;
+        if (c.moveToFirst()) {
+            count = c.getInt(0);
+        }
+        c.close();
+        return count;
+    }
+
+    public int getTotalRequests() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT COUNT(*) FROM requests", null);
+        int count = 0;
+        if (c.moveToFirst()) {
+            count = c.getInt(0);
+        }
+        c.close();
+        return count;
+    }
+
+    public int getTotalUsers() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT COUNT(*) FROM users", null);
+        int count = 0;
+        if (c.moveToFirst()) {
+            count = c.getInt(0);
+        }
+        c.close();
+        return count;
+    }
+
     public Cursor getSkillRequestedStats() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT skill_want, COUNT(*) as cnt FROM posts GROUP BY skill_want", null);
+        return db.rawQuery("SELECT skill_want, COUNT(*) FROM posts WHERE post_status = 'Open' GROUP BY skill_want", null);
     }
 
     public Cursor getSkillOfferedStats() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT skill_have, COUNT(*) as cnt FROM posts GROUP BY skill_have", null);
+        return db.rawQuery("SELECT skill_have, COUNT(*) FROM posts WHERE post_status = 'Open' GROUP BY skill_have", null);
+    }
+
+    public Cursor getTopRequestedSkills(int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT skill_want, COUNT(*) AS cnt FROM posts WHERE post_status = 'Open' GROUP BY skill_want ORDER BY cnt DESC LIMIT ?",
+                new String[]{String.valueOf(limit)}
+        );
+    }
+
+    public Cursor getTopOfferedSkills(int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT skill_have, COUNT(*) AS cnt FROM posts WHERE post_status = 'Open' GROUP BY skill_have ORDER BY cnt DESC LIMIT ?",
+                new String[]{String.valueOf(limit)}
+        );
+    }
+
+    public Cursor getTopActiveUsers(int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "SELECT u.email, u.name, " +
+                "IFNULL(p.post_count, 0) AS posts, " +
+                "IFNULL(r.req_count, 0) AS requests, " +
+                "(IFNULL(p.post_count, 0) + IFNULL(r.req_count, 0)) AS total_activity " +
+                "FROM users u " +
+                "LEFT JOIN (SELECT user_email AS email, COUNT(*) AS post_count FROM posts GROUP BY user_email) p ON u.email = p.email " +
+                "LEFT JOIN (SELECT sender_email AS email, COUNT(*) AS req_count FROM requests GROUP BY sender_email) r ON u.email = r.email " +
+                "WHERE total_activity > 0 " +
+                "ORDER BY total_activity DESC " +
+                "LIMIT ?";
+        return db.rawQuery(sql, new String[]{String.valueOf(limit)});
     }
 
     public Cursor getAllUsers() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT email, name, avatar_id FROM users ORDER BY name COLLATE NOCASE", null);
+        return db.rawQuery("SELECT email, name, avatar_id FROM users ORDER BY name ASC", null);
     }
 
     public Cursor getPostsByUser(String email) {
@@ -280,49 +344,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Cursor getRequestsByUser(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT id, post_id, sender_email, receiver_email, skill_offered, skill_required, message, status FROM requests WHERE sender_email = ? OR receiver_email = ? ORDER BY id DESC", new String[]{email, email});
-    }
-
-    public int getTotalOpenPosts() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM posts WHERE post_status = 'Open'", null);
-        int count = 0;
-        if (cursor.moveToFirst()) {
-            count = cursor.getInt(0);
-        }
-        cursor.close();
-        return count;
-    }
-
-    public int getTotalRequests() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM requests", null);
-        int count = 0;
-        if (cursor.moveToFirst()) {
-            count = cursor.getInt(0);
-        }
-        cursor.close();
-        return count;
-    }
-
-    public int getTotalUsers() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM users", null);
-        int count = 0;
-        if (cursor.moveToFirst()) {
-            count = cursor.getInt(0);
-        }
-        cursor.close();
-        return count;
-    }
-
-    public Cursor getTopRequestedSkills(int limit) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT skill_want, COUNT(*) as cnt FROM posts GROUP BY skill_want ORDER BY cnt DESC LIMIT " + limit, null);
-    }
-
-    public Cursor getTopOfferedSkills(int limit) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT skill_have, COUNT(*) as cnt FROM posts GROUP BY skill_have ORDER BY cnt DESC LIMIT " + limit, null);
+        return db.rawQuery("SELECT * FROM requests WHERE sender_email = ? OR receiver_email = ? ORDER BY id DESC", new String[]{email, email});
     }
 }

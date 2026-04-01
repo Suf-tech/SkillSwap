@@ -52,6 +52,12 @@ public class AdminUsersAdapter extends RecyclerView.Adapter<AdminUsersAdapter.Vi
         return users.size();
     }
 
+    public void updateList(List<AdminUser> newUsers) {
+        users.clear();
+        users.addAll(newUsers);
+        notifyDataSetChanged();
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView name;
         TextView email;
