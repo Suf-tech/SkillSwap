@@ -236,6 +236,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("Select * from requests where sender_email = ? OR receiver_email = ? ORDER BY id DESC", new String[]{email, email});
     }
 
+    public boolean deleteRequest(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete("requests", "id = ?", new String[]{String.valueOf(id)}) > 0;
+    }
+
     // --- 5. CHAT METHODS ---
     public boolean insertMessage(int requestId, String sender, String receiver, String text) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -250,5 +255,140 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getChatHistory(int requestId) {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM messages WHERE request_id = ? ORDER BY id ASC", new String[]{String.valueOf(requestId)});
+    }
+
+    // --- 6. ADMIN DASHBOARD STATS ---
+    public int getTotalOpenPosts() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT COUNT(*) FROM posts WHERE post_status = 'Open'", null);
+        int count = 0;
+        if (c.moveToFirst()) {
+            count = c.getInt(0);
+        }
+        c.close();
+        return count;
+    }
+
+    public int getTotalRequests() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT COUNT(*) FROM requests", null);
+        int count = 0;
+        if (c.moveToFirst()) {
+            count = c.getInt(0);
+        }
+        c.close();
+        return count;
+    }
+
+    public int getTotalUsers() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT COUNT(*) FROM users", null);
+        int count = 0;
+        if (c.moveToFirst()) {
+            count = c.getInt(0);
+        }
+        c.close();
+        return count;
+    }
+
+    public Cursor getSkillRequestedStats() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT skill_want, COUNT(*) FROM posts WHERE post_status = 'Open' GROUP BY skill_want", null);
+    }
+
+    public Cursor getSkillOfferedStats() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT skill_have, COUNT(*) FROM posts WHERE post_status = 'Open' GROUP BY skill_have", null);
+    }
+
+    public Cursor getTopRequestedSkills(int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT skill_want, COUNT(*) AS cnt FROM posts WHERE post_status = 'Open' GROUP BY skill_want ORDER BY cnt DESC LIMIT ?",
+                new String[]{String.valueOf(limit)}
+        );
+    }
+
+    public Cursor getTopOfferedSkills(int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT skill_have, COUNT(*) AS cnt FROM posts WHERE post_status = 'Open' GROUP BY skill_have ORDER BY cnt DESC LIMIT ?",
+                new String[]{String.valueOf(limit)}
+        );
+    }
+
+    public Cursor getTopActiveUsers(int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "SELECT u.email, u.name, " +
+                "IFNULL(p.post_count, 0) AS posts, " +
+                "IFNULL(r.req_count, 0) AS requests, " +
+                "(IFNULL(p.post_count, 0) + IFNULL(r.req_count, 0)) AS total_activity " +
+                "FROM users u " +
+                "LEFT JOIN (SELECT user_email AS email, COUNT(*) AS post_count FROM posts GROUP BY user_email) p ON u.email = p.email " +
+                "LEFT JOIN (SELECT sender_email AS email, COUNT(*) AS req_count FROM requests GROUP BY sender_email) r ON u.email = r.email " +
+                "WHERE total_activity > 0 " +
+                "ORDER BY total_activity DESC " +
+                "LIMIT ?";
+        return db.rawQuery(sql, new String[]{String.valueOf(limit)});
+    }
+
+    public Cursor getAllUsers() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT email, name, avatar_id FROM users ORDER BY name ASC", null);
+    }
+
+    public Cursor getPostsByUser(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT id, skill_have, skill_want, message, post_status FROM posts WHERE user_email = ? ORDER BY id DESC", new String[]{email});
+    }
+
+    public Cursor getRequestsByUser(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM requests WHERE sender_email = ? OR receiver_email = ? ORDER BY id DESC", new String[]{email, email});
+    }
+
+    public int getSkillPostCount(String skillName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String value = skillName.trim();
+        Cursor c = db.rawQuery(
+                "SELECT (" +
+                        "SELECT COUNT(*) FROM posts WHERE TRIM(LOWER(skill_have)) = TRIM(LOWER(?))" +
+                        ") + (" +
+                        "SELECT COUNT(*) FROM posts WHERE TRIM(LOWER(skill_want)) = TRIM(LOWER(?))" +
+                        ") AS total",
+                new String[]{value, value}
+        );
+        int count = 0;
+        if (c.moveToFirst()) {
+            count = c.getInt(0);
+        }
+        c.close();
+        return count;
+    }
+
+    public int getSkillRequestCount(String skillName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String value = skillName.trim();
+        Cursor c = db.rawQuery(
+                "SELECT COUNT(*) FROM requests WHERE TRIM(LOWER(skill_required)) = TRIM(LOWER(?))",
+                new String[]{value}
+        );
+        int count = 0;
+        if (c.moveToFirst()) {
+            count = c.getInt(0);
+        }
+        c.close();
+        return count;
+    }
+
+    public Cursor getRecentRequestUsersForSkill(String skillName, int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "SELECT r.sender_email, u.name, u.avatar_id, r.id " +
+                "FROM requests r " +
+                "LEFT JOIN users u ON r.sender_email = u.email " +
+                "WHERE TRIM(LOWER(r.skill_required)) = TRIM(LOWER(?)) " +
+                "ORDER BY r.id DESC " +
+                "LIMIT ?";
+        return db.rawQuery(sql, new String[]{skillName.trim(), String.valueOf(limit)});
     }
 }

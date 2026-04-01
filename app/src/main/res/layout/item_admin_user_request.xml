@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/editbox_background">
+
+    <TextView
+        android:id="@+id/reqDirection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="sender → receiver"
+        android:textColor="#1976D2"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/reqSkills"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Offers: X | Wants: Y"
+        android:textColor="#388E3C"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/reqMsg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Message"
+        android:textColor="#757575"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/reqStatusAdmin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status"
+        android:textColor="#757575"
+        android:textSize="12sp" />
+
+    <Button
+        android:id="@+id/btnDeleteRequest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#E64A19"
+        android:layout_marginTop="8dp" />
+
+</LinearLayout>

@@ -38,7 +38,15 @@ public class LoginActivity extends AppCompatActivity {
             if (TextUtils.isEmpty(inputEmail) || TextUtils.isEmpty(inputPass)) {
                 Toast.makeText(this, "Please enter all details!", Toast.LENGTH_SHORT).show();
             } else {
-                // Database check call
+                // First: hardcoded admin login (no session)
+                if (inputEmail.equals("admin") && inputPass.equals("adminpass")) {
+                    Intent intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
+
+                // Normal user login via database
                 boolean checkUserPass = db.checkEmailPassword(inputEmail, inputPass);
 
                 if (checkUserPass) {
