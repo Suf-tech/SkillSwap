@@ -1,64 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_splash">
+    android:orientation="vertical"
+    android:background="#FFFFFF">
 
-    <!-- Center Content -->
     <LinearLayout
-        android:id="@+id/centerContent"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#2196F3"
         android:orientation="vertical"
-        android:gravity="center"
-        android:alpha="0"
-        android:scaleX="0.9"
-        android:scaleY="0.9"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:padding="40dp"
+        android:gravity="center">
 
-        <!-- LOGO -->
         <ImageView
-            android:id="@+id/logoImage"
+            android:id="@+id/profileAvatar"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@mipmap/ic_launcher_round"
-            android:scaleType="centerInside" />
+            android:src="@drawable/editbox_background"
+            android:background="@drawable/editbox_background"
+            android:padding="5dp" />
 
-        <!-- APP NAME -->
+        <TextView
+            android:id="@+id/profileName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Sufiyan Khan"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/profileEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="sufiyan@email.com"
+            android:textColor="#E3F2FD"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
         <LinearLayout
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            android:gravity="center">
-
+            android:id="@+id/btnPersonalInfo"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:padding="10dp">
             <TextView
-                android:text="Skill"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:textSize="34sp" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Personal Information"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+        </LinearLayout>
 
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" />
+
+        <LinearLayout
+            android:id="@+id/btnIdentity"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:padding="10dp">
             <TextView
-                android:text="Swap"
-                android:textColor="#FFFFFF"
-                android:textSize="34sp" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My Identity Card"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" />
+
+        <LinearLayout
+            android:id="@+id/btnTheme"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center_vertical"
+            android:padding="10dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="App Theme (Standard)"
+                android:textColor="#757575"
+                android:textSize="16sp" />
         </LinearLayout>
 
     </LinearLayout>
-
-    <!-- LOADING -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginBottom="40dp"
-        android:indeterminateTint="#FFFFFF"
-        android:alpha="0"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
