@@ -1,6 +1,6 @@
 package com.example.skillswap;
 
-import android.app.AlertDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
@@ -47,11 +47,9 @@ public class AdminSkillsFragment extends Fragment {
 
         allSkills = loadSkills();
         adapter = new AdminSkillsAdapter(allSkills, skill -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-            builder.setTitle(skill.getName());
-            builder.setMessage("More details coming soon.");
-            builder.setPositiveButton("OK", null);
-            builder.show();
+            Intent intent = new Intent(requireContext(), AdminSkillDetailActivity.class);
+            intent.putExtra("skill_name", skill.getName());
+            startActivity(intent);
         });
         skillsRecyclerView.setAdapter(adapter);
 

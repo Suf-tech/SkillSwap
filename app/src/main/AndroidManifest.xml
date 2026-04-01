@@ -36,6 +36,7 @@
         <activity android:name=".AdminUsersActivity" android:exported="false" />
         <activity android:name=".UserDetailActivity" android:exported="false" />
         <activity android:name=".AdminEditUserActivity" android:exported="false" />
+        <activity android:name=".AdminSkillDetailActivity" android:exported="false" />
     </application>
 
 </manifest>

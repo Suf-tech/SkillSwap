@@ -346,4 +346,49 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM requests WHERE sender_email = ? OR receiver_email = ? ORDER BY id DESC", new String[]{email, email});
     }
+
+    public int getSkillPostCount(String skillName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String value = skillName.trim();
+        Cursor c = db.rawQuery(
+                "SELECT (" +
+                        "SELECT COUNT(*) FROM posts WHERE TRIM(LOWER(skill_have)) = TRIM(LOWER(?))" +
+                        ") + (" +
+                        "SELECT COUNT(*) FROM posts WHERE TRIM(LOWER(skill_want)) = TRIM(LOWER(?))" +
+                        ") AS total",
+                new String[]{value, value}
+        );
+        int count = 0;
+        if (c.moveToFirst()) {
+            count = c.getInt(0);
+        }
+        c.close();
+        return count;
+    }
+
+    public int getSkillRequestCount(String skillName) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String value = skillName.trim();
+        Cursor c = db.rawQuery(
+                "SELECT COUNT(*) FROM requests WHERE TRIM(LOWER(skill_required)) = TRIM(LOWER(?))",
+                new String[]{value}
+        );
+        int count = 0;
+        if (c.moveToFirst()) {
+            count = c.getInt(0);
+        }
+        c.close();
+        return count;
+    }
+
+    public Cursor getRecentRequestUsersForSkill(String skillName, int limit) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sql = "SELECT r.sender_email, u.name, u.avatar_id, r.id " +
+                "FROM requests r " +
+                "LEFT JOIN users u ON r.sender_email = u.email " +
+                "WHERE TRIM(LOWER(r.skill_required)) = TRIM(LOWER(?)) " +
+                "ORDER BY r.id DESC " +
+                "LIMIT ?";
+        return db.rawQuery(sql, new String[]{skillName.trim(), String.valueOf(limit)});
+    }
 }
