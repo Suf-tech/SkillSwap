@@ -25,14 +25,15 @@
                 android:id="@+id/idAvatar"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:src="@drawable/editbox_background" />
+                android:src="@drawable/editbox_background"
+                android:contentDescription="@string/cd_identity_avatar" />
 
             <TextView
                 android:id="@+id/idName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="User Name"
+                android:text="@string/identity_user_name_placeholder"
                 android:textColor="#000000"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -41,7 +42,7 @@
                 android:id="@+id/idEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="user@email.com"
+                android:text="@string/identity_user_email_placeholder"
                 android:textColor="#757575" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -50,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
-        android:text="Skill Swap Stats"
+        android:text="@string/identity_stats_title"
         android:textColor="#000000"
         android:textStyle="bold"
         android:textSize="18sp" />
@@ -78,14 +79,14 @@
                     android:id="@+id/taughtCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0"
+                    android:text="@string/identity_taught_count_default"
                     android:textSize="24sp"
                     android:textColor="#2196F3"
                     android:textStyle="bold" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Skills Taught"
+                    android:text="@string/identity_skills_taught_label"
                     android:textColor="#757575"
                     android:textSize="12sp"/>
             </LinearLayout>
@@ -107,14 +108,14 @@
                     android:id="@+id/learnedCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0"
+                    android:text="@string/identity_learned_count_default"
                     android:textSize="24sp"
                     android:textColor="#4CAF50"
                     android:textStyle="bold" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Skills Learned"
+                    android:text="@string/identity_skills_learned_label"
                     android:textColor="#757575"
                     android:textSize="12sp"/>
             </LinearLayout>

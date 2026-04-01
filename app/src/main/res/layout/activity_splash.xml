@@ -1,50 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#2196F3">
 
+    <!-- Center Content -->
+    <LinearLayout
+        android:id="@+id/centerContent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent">
+
+    <!-- LOGO IMAGE -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@mipmap/ic_launcher_round"
+        android:scaleType="centerInside"
+        android:contentDescription="@string/cd_app_logo" />
+
+    <!-- APP NAME -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:orientation="horizontal"
+        android:gravity="center">
 
         <TextView
-            android:id="@+id/appLogo"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:background="@android:drawable/btn_default_small"
-            android:backgroundTint="#FFFFFF"
-            android:gravity="center"
-            android:text="SS"
-            android:textColor="#2196F3"
-            android:textSize="40sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/appName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="SkillSwap"
-            android:textSize="36sp"
+            android:text="@string/app_title_skill"
+            android:textStyle="bold"
             android:textColor="#FFFFFF"
-            android:textStyle="bold" />
+            android:textSize="34sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_title_swap"
+            android:textColor="#FFFFFF"
+            android:textSize="34sp" />
+        <!-- ❌ removed alpha to fix contrast -->
     </LinearLayout>
 
-    <ProgressBar
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginBottom="50dp"
-        android:indeterminateTint="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+</LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- LOADING -->
+<ProgressBar
+android:id="@+id/progressBar"
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:layout_marginBottom="40dp"
+    android:indeterminateTint="#FFFFFF"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>

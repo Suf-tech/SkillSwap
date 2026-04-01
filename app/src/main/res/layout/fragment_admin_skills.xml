@@ -9,7 +9,7 @@
         android:id="@+id/adminSkillSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Search skills"
+        android:hint="@string/admin_skills_search_hint"
         android:padding="12dp"
         android:background="@drawable/editbox_background"
         android:drawableStart="@android:drawable/ic_menu_search"
@@ -23,4 +23,3 @@
         android:paddingTop="12dp" />
 
 </LinearLayout>
-

@@ -11,7 +11,8 @@
         android:id="@+id/requesterAvatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/editbox_background" />
+        android:src="@drawable/editbox_background"
+        android:contentDescription="@string/cd_requester_avatar" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -38,4 +39,3 @@
     </LinearLayout>
 
 </LinearLayout>
-

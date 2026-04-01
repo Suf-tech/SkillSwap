@@ -15,7 +15,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Create Account"
+            android:text="@string/signup_title"
             android:textColor="#2196F3"
             android:textSize="30sp"
             android:textStyle="bold" />
@@ -26,7 +26,7 @@
             android:layout_height="55dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/editbox_background"
-            android:hint="Full Name"
+            android:hint="@string/signup_full_name_hint"
             android:textColor="?android:attr/textColorPrimary"
             android:textColorHint="?android:attr/textColorSecondary"
             android:padding="12dp" />
@@ -37,7 +37,7 @@
             android:layout_height="55dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/editbox_background"
-            android:hint="Email Address"
+            android:hint="@string/signup_email_hint"
             android:textColor="?android:attr/textColorPrimary"
             android:textColorHint="?android:attr/textColorSecondary"
             android:padding="12dp"
@@ -55,7 +55,7 @@
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:hint="Password (min 8 char)"
+                android:hint="@string/signup_password_hint"
                 android:textColor="?android:attr/textColorPrimary"
                 android:inputType="textPassword"
                 android:padding="12dp"
@@ -73,7 +73,7 @@
                 android:id="@+id/confirmPassword"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:hint="Confirm Password"
+                android:hint="@string/signup_confirm_password_hint"
                 android:textColor="?android:attr/textColorPrimary"
                 android:inputType="textPassword"
                 android:padding="12dp"
@@ -86,7 +86,7 @@
             android:layout_height="55dp"
             android:layout_marginTop="16dp"
             android:backgroundTint="#2196F3"
-            android:text="Signup"
+            android:text="@string/signup_button"
             android:textAllCaps="false"
             android:textSize="18sp" />
 

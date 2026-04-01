@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome Back"
+            android:text="@string/login_welcome_back"
             android:textColor="#2196F3"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -28,7 +28,7 @@
             android:layout_height="55dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/editbox_background"
-            android:hint="Email Address"
+            android:hint="@string/login_email_hint"
             android:textColor="#000000"
             android:padding="12dp"
             android:inputType="textEmailAddress" />
@@ -39,7 +39,7 @@
             android:layout_height="55dp"
             android:layout_marginTop="15dp"
             android:background="@drawable/editbox_background"
-            android:hint="Password"
+            android:hint="@string/login_password_hint"
             android:textColor="#000000"
             android:padding="12dp"
             android:inputType="textPassword" />
@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="10dp"
-            android:text="Forgot Password?"
+            android:text="@string/login_forgot_password"
             android:textColor="#2196F3"
             android:textStyle="bold" />
 
@@ -60,7 +60,7 @@
             android:layout_height="55dp"
             android:layout_marginTop="24dp"
             android:backgroundTint="#2196F3"
-            android:text="Login"
+            android:text="@string/login_button"
             android:textAllCaps="false"
             android:textColor="#FFFFFF" />
 
@@ -69,7 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Don't have an account? Sign Up"
+            android:text="@string/login_signup_prompt"
             android:textColor="#757575" />
 
     </LinearLayout>

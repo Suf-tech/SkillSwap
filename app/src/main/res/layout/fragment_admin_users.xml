@@ -12,7 +12,7 @@
         android:layout_margin="12dp"
         android:padding="10dp"
         android:background="@drawable/editbox_background"
-        android:hint="Search users by name or email"
+        android:hint="@string/admin_users_search_hint"
         android:textColor="#000000"
         android:textColorHint="#757575"
         android:textSize="14sp"

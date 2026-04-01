@@ -7,7 +7,7 @@
     android:background="#FFFFFF"> <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="Edit Your Post"
+    android:text="@string/edit_post_title"
     android:textSize="22sp"
     android:textStyle="bold"
     android:textColor="#2196F3"
@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@drawable/editbox_background"
-        android:hint="Skill you have"
+        android:hint="@string/edit_post_skill_have_hint"
         android:padding="12dp"
         android:textColor="#000000" />
 
@@ -28,7 +28,7 @@
         android:layout_height="50dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/editbox_background"
-        android:hint="Skill you want"
+        android:hint="@string/edit_post_skill_want_hint"
         android:padding="12dp"
         android:textColor="#000000" />
 
@@ -38,7 +38,7 @@
         android:layout_height="100dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/editbox_background"
-        android:hint="Message"
+        android:hint="@string/edit_post_message_hint"
         android:gravity="top"
         android:padding="12dp"
         android:textColor="#000000" />
@@ -49,7 +49,7 @@
         android:layout_height="55dp"
         android:layout_marginTop="20dp"
         android:backgroundTint="#2196F3"
-        android:text="Save Changes"
+        android:text="@string/edit_post_save_changes"
         android:textColor="#FFFFFF" />
 
     <Button
@@ -58,7 +58,7 @@
         android:layout_height="55dp"
         android:layout_marginTop="10dp"
         android:backgroundTint="#F44336"
-        android:text="Delete Post"
+        android:text="@string/edit_post_delete_post"
         android:textColor="#FFFFFF" />
 
 </LinearLayout>

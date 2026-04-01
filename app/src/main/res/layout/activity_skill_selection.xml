@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Complete Your Profile"
+            android:text="@string/skill_selection_title"
             android:textColor="#2196F3"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -25,19 +25,20 @@
             android:layout_height="100dp"
             android:layout_marginTop="15dp"
             android:background="@drawable/editbox_background"
-            android:padding="5dp" />
+            android:padding="5dp"
+            android:contentDescription="@string/cd_selected_avatar_preview" />
 
         <GridLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:columnCount="3"
             android:layout_marginTop="15dp">
-            <ImageView android:id="@+id/imgM1" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_m1" android:background="@drawable/editbox_background" android:padding="5dp"/>
-            <ImageView android:id="@+id/imgM2" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_m2" android:background="@drawable/editbox_background" android:padding="5dp"/>
-            <ImageView android:id="@+id/imgM3" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_m3" android:background="@drawable/editbox_background" android:padding="5dp"/>
-            <ImageView android:id="@+id/imgF1" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_f1" android:background="@drawable/editbox_background" android:padding="5dp"/>
-            <ImageView android:id="@+id/imgF2" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_f2" android:background="@drawable/editbox_background" android:padding="5dp"/>
-            <ImageView android:id="@+id/imgF3" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_f3" android:background="@drawable/editbox_background" android:padding="5dp"/>
+            <ImageView android:id="@+id/imgM1" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_m1" android:background="@drawable/editbox_background" android:padding="5dp" android:contentDescription="@string/cd_avatar_option_1"/>
+            <ImageView android:id="@+id/imgM2" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_m2" android:background="@drawable/editbox_background" android:padding="5dp" android:contentDescription="@string/cd_avatar_option_2"/>
+            <ImageView android:id="@+id/imgM3" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_m3" android:background="@drawable/editbox_background" android:padding="5dp" android:contentDescription="@string/cd_avatar_option_3"/>
+            <ImageView android:id="@+id/imgF1" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_f1" android:background="@drawable/editbox_background" android:padding="5dp" android:contentDescription="@string/cd_avatar_option_4"/>
+            <ImageView android:id="@+id/imgF2" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_f2" android:background="@drawable/editbox_background" android:padding="5dp" android:contentDescription="@string/cd_avatar_option_5"/>
+            <ImageView android:id="@+id/imgF3" android:layout_width="60dp" android:layout_height="60dp" android:layout_margin="5dp" android:src="@drawable/avatar_f3" android:background="@drawable/editbox_background" android:padding="5dp" android:contentDescription="@string/cd_avatar_option_6"/>
         </GridLayout>
 
         <EditText
@@ -47,7 +48,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/editbox_background"
             android:textColor="#000000"
-            android:hint="Skill you can teach"
+            android:hint="@string/skill_selection_skill_have_hint"
             android:padding="12dp" />
 
         <EditText
@@ -57,14 +58,14 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/editbox_background"
             android:textColor="#000000"
-            android:hint="Skill you want to learn"
+            android:hint="@string/skill_selection_skill_want_hint"
             android:padding="12dp" />
 
         <Button
             android:id="@+id/finishBtn"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:text="Complete Setup"
+            android:text="@string/skill_selection_complete_setup"
             android:backgroundTint="#2196F3"
             android:layout_marginTop="20dp" />
     </LinearLayout>

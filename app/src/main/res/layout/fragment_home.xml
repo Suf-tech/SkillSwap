@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:background="@drawable/editbox_background"
-            android:hint="Search skills (e.g., Python, UI/UX)..."
+            android:hint="@string/home_search_hint"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:drawableStart="@android:drawable/ic_menu_search"

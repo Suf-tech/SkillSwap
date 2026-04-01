@@ -13,7 +13,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Personal Information"
+            android:text="@string/personal_info_title"
             android:textColor="#2196F3"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -26,14 +26,15 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/editbox_background"
             android:padding="5dp"
-            android:src="@drawable/editbox_background" />
+            android:src="@drawable/editbox_background"
+            android:contentDescription="@string/cd_current_avatar" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
-            android:text="Tap below to change avatar"
+            android:text="@string/personal_info_avatar_help"
             android:textColor="#757575"
             android:textSize="12sp" />
 
@@ -44,12 +45,12 @@
             android:layout_marginTop="10dp"
             android:columnCount="3">
 
-            <ImageView android:id="@+id/av1" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m1" android:background="@drawable/editbox_background" android:padding="3dp"/>
-            <ImageView android:id="@+id/av2" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m2" android:background="@drawable/editbox_background" android:padding="3dp"/>
-            <ImageView android:id="@+id/av3" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m3" android:background="@drawable/editbox_background" android:padding="3dp"/>
-            <ImageView android:id="@+id/av4" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f1" android:background="@drawable/editbox_background" android:padding="3dp"/>
-            <ImageView android:id="@+id/av5" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f2" android:background="@drawable/editbox_background" android:padding="3dp"/>
-            <ImageView android:id="@+id/av6" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f3" android:background="@drawable/editbox_background" android:padding="3dp"/>
+            <ImageView android:id="@+id/av1" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m1" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_1"/>
+            <ImageView android:id="@+id/av2" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m2" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_2"/>
+            <ImageView android:id="@+id/av3" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m3" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_3"/>
+            <ImageView android:id="@+id/av4" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f1" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_4"/>
+            <ImageView android:id="@+id/av5" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f2" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_5"/>
+            <ImageView android:id="@+id/av6" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f3" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_6"/>
         </GridLayout>
 
         <EditText
@@ -58,7 +59,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="20dp"
             android:background="@drawable/editbox_background"
-            android:hint="Full Name"
+            android:hint="@string/personal_info_full_name_hint"
             android:padding="12dp"
             android:textColor="#000000" />
 
@@ -77,7 +78,7 @@
             android:layout_height="50dp"
             android:layout_marginTop="10dp"
             android:background="@drawable/editbox_background"
-            android:hint="Password"
+            android:hint="@string/personal_info_password_hint"
             android:inputType="textPassword"
             android:padding="12dp"
             android:textColor="#000000" />
@@ -88,7 +89,7 @@
             android:layout_height="55dp"
             android:layout_marginTop="30dp"
             android:backgroundTint="#2196F3"
-            android:text="Update Profile"
+            android:text="@string/personal_info_update_button"
             android:textAllCaps="false"
             android:textColor="#FFFFFF" />
     </LinearLayout>

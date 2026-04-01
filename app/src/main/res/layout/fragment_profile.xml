@@ -20,14 +20,15 @@
             android:layout_height="100dp"
             android:src="@drawable/editbox_background"
             android:background="@drawable/editbox_background"
-            android:padding="5dp" />
+            android:padding="5dp"
+            android:contentDescription="@string/cd_profile_avatar" />
 
         <TextView
             android:id="@+id/profileName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Loading..."
+            android:text="@string/profile_loading_name"
             android:textColor="#FFFFFF"
             android:textSize="22sp"
             android:textStyle="bold" />
@@ -36,7 +37,7 @@
             android:id="@+id/profileEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="loading@email.com"
+            android:text="@string/profile_loading_email"
             android:textColor="#E3F2FD"
             android:textSize="14sp" />
 
@@ -50,7 +51,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="⭐"
+                android:text="@string/rating_star"
                 android:textSize="18sp" />
 
             <TextView
@@ -58,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="4dp"
-                android:text="No Ratings Yet"
+                android:text="@string/profile_no_ratings"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 android:textSize="14sp" />
@@ -80,7 +81,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Personal Information"
+                android:text="@string/profile_personal_information"
                 android:textColor="#000000"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -96,7 +97,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="My Identity Card"
+                android:text="@string/profile_identity_card"
                 android:textColor="#000000"
                 android:textSize="16sp" />
         </LinearLayout>
@@ -112,7 +113,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="App Theme (Standard)"
+                android:text="@string/profile_app_theme_standard"
                 android:textColor="#757575"
                 android:textSize="16sp" />
         </LinearLayout>
