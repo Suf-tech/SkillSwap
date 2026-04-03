@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     android:background="?android:attr/windowBackground">
 
     <LinearLayout
@@ -12,12 +13,20 @@
         android:padding="32dp"
         android:gravity="center">
 
+        <ImageView
+            android:id="@+id/appLogo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="16dp"
+            android:src="@mipmap/ic_launcher_round"
+            android:contentDescription="App Logo" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/signup_title"
             android:textColor="#2196F3"
-            android:textSize="30sp"
+            android:textSize="28sp"
             android:textStyle="bold" />
 
         <EditText
@@ -89,6 +98,34 @@
             android:text="@string/signup_button"
             android:textAllCaps="false"
             android:textSize="18sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Have an account? "
+                android:textColor="#757575" />
+
+            <TextView
+                android:id="@+id/loginText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Log In "
+                android:textColor="#2196F3"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Here"
+                android:textColor="#757575" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>
