@@ -22,6 +22,7 @@ public class UserDetailActivity extends AppCompatActivity {
 
     private ImageView profileAvatar;
     private TextView profileName;
+    private TextView profileGender;
     private TextView profileEmail;
     private LinearLayout containerUserPosts;
     private LinearLayout containerUserRequests;
@@ -47,6 +48,7 @@ public class UserDetailActivity extends AppCompatActivity {
 
         profileAvatar = findViewById(R.id.userDetailAvatar);
         profileName = findViewById(R.id.userDetailName);
+        profileGender = findViewById(R.id.userDetailGender);
         profileEmail = findViewById(R.id.userDetailEmail);
         containerUserPosts = findViewById(R.id.containerUserPosts);
         containerUserRequests = findViewById(R.id.containerUserRequests);
@@ -57,6 +59,10 @@ public class UserDetailActivity extends AppCompatActivity {
 
         profileName.setText(userName);
         profileEmail.setText(userEmail);
+        
+        String gender = db.getUserGender(userEmail);
+        profileGender.setText("Gender: " + gender);
+
         setAvatar(profileAvatar, avatarId);
 
         loadUserPosts();

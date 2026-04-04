@@ -45,7 +45,9 @@
         <activity
             android:name=".ForgetPasswordActivity"
             android:exported="false" />
-        <activity android:name=".ChatActivity" />
+        <activity
+            android:name=".ChatActivity"
+            android:exported="false" />
         <activity
             android:name=".AdminDashboardActivity"
             android:exported="false" />

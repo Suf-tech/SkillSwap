@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,7 @@ public class AdminEditUserActivity extends AppCompatActivity {
 
     private EditText editName;
     private EditText editEmail;
+    private RadioGroup genderRadioGroup;
     private ImageView currentAv;
     private SwitchMaterial switchForceReset;
     private Button btnUpdate;
@@ -41,6 +43,7 @@ public class AdminEditUserActivity extends AppCompatActivity {
 
         editName = findViewById(R.id.editName);
         editEmail = findViewById(R.id.editEmail);
+        genderRadioGroup = findViewById(R.id.genderRadioGroup);
         switchForceReset = findViewById(R.id.switchForceReset);
         btnUpdate = findViewById(R.id.btnUpdateInfo);
         currentAv = findViewById(R.id.currentSelectedAv);
@@ -55,6 +58,13 @@ public class AdminEditUserActivity extends AppCompatActivity {
         editEmail.setText(userEmail);
         editEmail.setEnabled(false); 
         
+        String gender = db.getUserGender(userEmail);
+        if ("Female".equalsIgnoreCase(gender)) {
+            genderRadioGroup.check(R.id.radioFemale);
+        } else {
+            genderRadioGroup.check(R.id.radioMale);
+        }
+
         switchForceReset.setChecked(db.needsPasswordReset(userEmail));
 
         selectedAvatarId = db.getAvatarId(userEmail);
@@ -66,12 +76,18 @@ public class AdminEditUserActivity extends AppCompatActivity {
             String newName = editName.getText().toString().trim();
             boolean forceReset = switchForceReset.isChecked();
 
+            int selectedGenderId = genderRadioGroup.getCheckedRadioButtonId();
+            String newGender = "Male";
+            if (selectedGenderId == R.id.radioFemale) {
+                newGender = "Female";
+            }
+
             if (newName.isEmpty()) {
                 Toast.makeText(this, "Please enter a name", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (db.adminUpdateUser(userEmail, newName, selectedAvatarId, forceReset)) {
+            if (db.adminUpdateUser(userEmail, newName, newGender, selectedAvatarId, forceReset)) {
                 Toast.makeText(this, "User updated successfully", Toast.LENGTH_SHORT).show();
                 finish();
             } else {

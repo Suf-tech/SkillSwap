@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class PersonalInfoActivity extends AppCompatActivity {
 
     EditText editName, editPass, editEmail;
+    RadioGroup genderRadioGroup;
     ImageView currentAv;
     Button btnUpdate;
     DatabaseHelper db;
@@ -29,6 +31,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
         editName = findViewById(R.id.editName);
         editEmail = findViewById(R.id.editEmail);
         editPass = findViewById(R.id.editPass);
+        genderRadioGroup = findViewById(R.id.genderRadioGroup);
         btnUpdate = findViewById(R.id.btnUpdateInfo);
         currentAv = findViewById(R.id.currentSelectedAv);
 
@@ -38,6 +41,13 @@ public class PersonalInfoActivity extends AppCompatActivity {
         editEmail.setEnabled(false); // Email lock
         editPass.setText(db.getPassword(userEmail));
 
+        String gender = db.getUserGender(userEmail);
+        if ("Female".equalsIgnoreCase(gender)) {
+            genderRadioGroup.check(R.id.radioFemale);
+        } else {
+            genderRadioGroup.check(R.id.radioMale);
+        }
+
         selectedAvatarId = db.getAvatarId(userEmail);
         updatePreview(selectedAvatarId);
 
@@ -46,6 +56,12 @@ public class PersonalInfoActivity extends AppCompatActivity {
         btnUpdate.setOnClickListener(v -> {
             String newName = editName.getText().toString().trim();
             String newPass = editPass.getText().toString().trim();
+            
+            int selectedGenderId = genderRadioGroup.getCheckedRadioButtonId();
+            String newGender = "Male";
+            if (selectedGenderId == R.id.radioFemale) {
+                newGender = "Female";
+            }
 
             if (newName.isEmpty() || newPass.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
@@ -53,7 +69,7 @@ public class PersonalInfoActivity extends AppCompatActivity {
             }
 
             // Database update call
-            if (db.updateFullProfile(userEmail, newName, newPass, selectedAvatarId)) {
+            if (db.updateFullProfile(userEmail, newName, newPass, newGender, selectedAvatarId)) {
                 Toast.makeText(this, "Profile Updated Successfully!", Toast.LENGTH_SHORT).show();
                 finish(); // Go back to Profile
             } else {

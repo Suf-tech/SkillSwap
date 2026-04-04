@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +17,7 @@ public class SignupActivity extends AppCompatActivity {
 
     EditText name, email, password, confirmPassword;
     TextInputLayout passwordLayout, confirmPasswordLayout;
+    RadioGroup genderRadioGroup;
     Button signupBtn;
     TextView loginText;
     DatabaseHelper db;
@@ -32,6 +35,7 @@ public class SignupActivity extends AppCompatActivity {
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         confirmPassword = findViewById(R.id.confirmPassword);
+        genderRadioGroup = findViewById(R.id.genderRadioGroup);
 
         passwordLayout = findViewById(R.id.passwordLayout);
         confirmPasswordLayout = findViewById(R.id.confirmPasswordLayout);
@@ -52,6 +56,12 @@ public class SignupActivity extends AppCompatActivity {
             String e = email.getText().toString().trim();
             String p = password.getText().toString();
             String cp = confirmPassword.getText().toString();
+
+            int selectedGenderId = genderRadioGroup.getCheckedRadioButtonId();
+            String gender = "Male";
+            if (selectedGenderId == R.id.radioFemale) {
+                gender = "Female";
+            }
 
             // Reset Errors
             passwordLayout.setError(null);
@@ -82,7 +92,7 @@ public class SignupActivity extends AppCompatActivity {
             }
 
             // 5. Insert Data into SQLite Database
-            Boolean insert = db.insertData(e, n, p);
+            Boolean insert = db.insertData(e, n, p, gender);
 
             if (insert) {
                 // Session Management: Save email to SharedPreferences
