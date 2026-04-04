@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -19,6 +21,8 @@ public class HomeFragment extends Fragment {
 
     RecyclerView recyclerView;
     EditText searchBar;
+    LinearLayout emptyStateLayout;
+    TextView emptyStateText;
     ArrayList<Skill> skillList;
     SkillAdapter adapter;
     DatabaseHelper db;
@@ -31,6 +35,9 @@ public class HomeFragment extends Fragment {
         db = new DatabaseHelper(requireContext());
         searchBar = view.findViewById(R.id.searchBar);
         recyclerView = view.findViewById(R.id.recyclerView);
+        emptyStateLayout = view.findViewById(R.id.emptyStateLayout);
+        emptyStateText = view.findViewById(R.id.emptyStateText);
+        
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
         loadPosts();
@@ -53,14 +60,16 @@ public class HomeFragment extends Fragment {
 
     private void filterList(String text) {
         ArrayList<Skill> filteredList = new ArrayList<>();
+        String query = text.toLowerCase().trim();
+        
         for (Skill item : skillList) {
-            if (item.getTitle().toLowerCase().contains(text.toLowerCase())) {
+            if (item.getTitle().toLowerCase().contains(query)) {
                 filteredList.add(item);
             } else {
                 Cursor cursor = db.getPostById(item.getId());
                 if(cursor != null && cursor.moveToFirst()){
                     String want = cursor.getString(4);
-                    if (want.toLowerCase().contains(text.toLowerCase())) {
+                    if (want.toLowerCase().contains(query)) {
                         filteredList.add(item);
                     }
                     cursor.close();
@@ -70,6 +79,15 @@ public class HomeFragment extends Fragment {
 
         if (adapter != null) {
             adapter.setFilteredList(filteredList);
+        }
+
+        if (filteredList.isEmpty() && !query.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            emptyStateLayout.setVisibility(View.VISIBLE);
+            emptyStateText.setText("No users found matching '" + text + "'");
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyStateLayout.setVisibility(View.GONE);
         }
     }
 
@@ -93,6 +111,14 @@ public class HomeFragment extends Fragment {
 
         adapter = new SkillAdapter(requireContext(), skillList);
         recyclerView.setAdapter(adapter);
+        
+        // Ensure UI state is correct after reload
+        if (searchBar != null && !searchBar.getText().toString().isEmpty()) {
+            filterList(searchBar.getText().toString());
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyStateLayout.setVisibility(View.GONE);
+        }
     }
 
     @Override
