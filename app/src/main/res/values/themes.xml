@@ -1,7 +1,9 @@
 <resources>
-    <style name="Theme.SkillSwap" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="Theme.SkillSwap" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">#2196F3</item>
         <item name="colorPrimaryDark">#1976D2</item>
         <item name="colorAccent">#2196F3</item>
-        <item name="android:windowBackground">#FFFFFF</item> <item name="android:textColorPrimary">#000000</item> </style>
+        <item name="android:windowBackground">#FFFFFF</item>
+        <item name="android:textColorPrimary">#000000</item>
+    </style>
 </resources>

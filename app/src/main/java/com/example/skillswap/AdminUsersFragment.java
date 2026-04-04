@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +27,8 @@ public class AdminUsersFragment extends Fragment {
     private RecyclerView usersRecyclerView;
     private AdminUsersAdapter adapter;
     private List<AdminUser> allUsers;
+    private View emptyStateLayout;
+    private TextView emptyStateText;
 
     @Nullable
     @Override
@@ -40,6 +43,9 @@ public class AdminUsersFragment extends Fragment {
         db = new DatabaseHelper(requireContext());
 
         usersRecyclerView = view.findViewById(R.id.usersRecyclerView);
+        emptyStateLayout = view.findViewById(R.id.emptyStateLayout);
+        emptyStateText = view.findViewById(R.id.emptyStateText);
+        
         usersRecyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 2));
 
         allUsers = loadUsers();
@@ -107,6 +113,8 @@ public class AdminUsersFragment extends Fragment {
         String lower = query.trim().toLowerCase();
         if (lower.isEmpty()) {
             adapter.updateList(new ArrayList<>(allUsers));
+            usersRecyclerView.setVisibility(View.VISIBLE);
+            emptyStateLayout.setVisibility(View.GONE);
             return;
         }
 
@@ -118,6 +126,16 @@ public class AdminUsersFragment extends Fragment {
                 filtered.add(user);
             }
         }
+        
         adapter.updateList(filtered);
+
+        if (filtered.isEmpty()) {
+            usersRecyclerView.setVisibility(View.GONE);
+            emptyStateLayout.setVisibility(View.VISIBLE);
+            emptyStateText.setText(getString(R.string.admin_no_users_found, query));
+        } else {
+            usersRecyclerView.setVisibility(View.VISIBLE);
+            emptyStateLayout.setVisibility(View.GONE);
+        }
     }
 }

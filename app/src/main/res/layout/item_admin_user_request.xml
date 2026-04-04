@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -39,13 +40,17 @@
         android:textColor="#757575"
         android:textSize="12sp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnDeleteRequest"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="Delete"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#E64A19"
-        android:layout_marginTop="8dp" />
+        android:textColor="#E64A19"
+        app:strokeColor="#E64A19"
+        app:icon="@android:drawable/ic_menu_delete"
+        app:iconTint="#E64A19"
+        app:iconSize="18dp" />
 
 </LinearLayout>

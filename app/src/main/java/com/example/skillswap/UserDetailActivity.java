@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -80,16 +81,23 @@ public class UserDetailActivity extends AppCompatActivity {
                 TextView tvStatus = row.findViewById(R.id.postStatus);
                 Button btnDelete = row.findViewById(R.id.btnDeletePost);
 
-                tvHave.setText("Have: " + have);
-                tvWant.setText("Want: " + want);
+                tvHave.setText("Offered: " + have);
+                tvWant.setText("Wanted: " + want);
                 tvMsg.setText(msg == null ? "" : msg);
                 tvStatus.setText(status);
 
                 btnDelete.setOnClickListener(v -> {
-                    if (db.deletePost(postId)) {
-                        containerUserPosts.removeView(row);
-                        Toast.makeText(this, "Post deleted", Toast.LENGTH_SHORT).show();
-                    }
+                    new AlertDialog.Builder(this)
+                            .setTitle("Delete Post")
+                            .setMessage("Are you sure you want to delete this post? This action cannot be undone.")
+                            .setPositiveButton("Delete", (dialog, which) -> {
+                                if (db.deletePost(postId)) {
+                                    containerUserPosts.removeView(row);
+                                    Toast.makeText(this, "Post deleted", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
                 });
 
                 containerUserPosts.addView(row);
@@ -119,15 +127,22 @@ public class UserDetailActivity extends AppCompatActivity {
                 Button btnDelete = row.findViewById(R.id.btnDeleteRequest);
 
                 tvDirection.setText(sender + " → " + receiver);
-                tvSkills.setText("Offers: " + offered + "  |  Wants: " + required);
+                tvSkills.setText("Offered: " + offered + "  |  Wanted: " + required);
                 tvMsg.setText(msg == null ? "" : msg);
                 tvStatus.setText(status);
 
                 btnDelete.setOnClickListener(v -> {
-                    if (db.deleteRequest(reqId)) {
-                        containerUserRequests.removeView(row);
-                        Toast.makeText(this, "Request deleted", Toast.LENGTH_SHORT).show();
-                    }
+                    new AlertDialog.Builder(this)
+                            .setTitle("Delete Request")
+                            .setMessage("Are you sure you want to delete this request? This action cannot be undone.")
+                            .setPositiveButton("Delete", (dialog, which) -> {
+                                if (db.deleteRequest(reqId)) {
+                                    containerUserRequests.removeView(row);
+                                    Toast.makeText(this, "Request deleted", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
                 });
 
                 containerUserRequests.addView(row);
@@ -147,4 +162,3 @@ public class UserDetailActivity extends AppCompatActivity {
         iv.setImageResource(res);
     }
 }
-

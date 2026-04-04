@@ -5,18 +5,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class AdminDonutChartView extends View {
 
     private final Paint backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint segmentPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private final List<DonutSegment> segments = new ArrayList<>();
 
@@ -38,18 +35,10 @@ public class AdminDonutChartView extends View {
     private void init() {
         backgroundPaint.setStyle(Paint.Style.STROKE);
         backgroundPaint.setStrokeCap(Paint.Cap.ROUND);
-        backgroundPaint.setColor(Color.parseColor("#E0E0E0"));
+        backgroundPaint.setColor(Color.parseColor("#F5F5F5"));
 
         segmentPaint.setStyle(Paint.Style.STROKE);
         segmentPaint.setStrokeCap(Paint.Cap.BUTT);
-
-        labelPaint.setStyle(Paint.Style.FILL);
-        labelPaint.setColor(Color.parseColor("#212121"));
-        labelPaint.setTextAlign(Paint.Align.CENTER);
-        float textSizeSp = 12f;
-        float textSizePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
-                textSizeSp, getResources().getDisplayMetrics());
-        labelPaint.setTextSize(textSizePx);
     }
 
     public void setSegments(List<DonutSegment> newSegments) {
@@ -70,7 +59,8 @@ public class AdminDonutChartView extends View {
 
         if (size <= 0) return;
 
-        float strokeWidth = size * 0.16f; // 16% of size
+        // Thicker donut ring as requested
+        float strokeWidth = size * 0.25f; 
         backgroundPaint.setStrokeWidth(strokeWidth);
         segmentPaint.setStrokeWidth(strokeWidth);
 
@@ -82,7 +72,6 @@ public class AdminDonutChartView extends View {
         canvas.drawCircle(cx, cy, radius, backgroundPaint);
 
         if (segments.isEmpty()) {
-            // No data: optionally could draw a text like "No data"
             return;
         }
 
@@ -93,20 +82,6 @@ public class AdminDonutChartView extends View {
             segmentPaint.setColor(seg.color);
             canvas.drawArc(cx - radius, cy - radius, cx + radius, cy + radius,
                     startAngle, sweepAngle, false, segmentPaint);
-
-            // Draw label only for reasonably sized segments (>= 5%)
-            if (seg.percentage >= 0.05f) {
-                float midAngle = startAngle + sweepAngle / 2f;
-                double rad = Math.toRadians(midAngle);
-                float labelRadius = radius - strokeWidth * 0.35f;
-                float lx = cx + (float) Math.cos(rad) * labelRadius;
-                float ly = cy + (float) Math.sin(rad) * labelRadius;
-
-                String percentText = String.format(Locale.getDefault(), "%.0f%%", seg.percentage * 100f);
-                String text = seg.label + " " + percentText;
-                // y is baseline; adjust a bit upward
-                canvas.drawText(text, lx, ly, labelPaint);
-            }
 
             startAngle += sweepAngle;
         }

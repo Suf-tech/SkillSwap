@@ -3,6 +3,7 @@ package com.example.skillswap;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,8 +36,8 @@ public class SplashActivity extends AppCompatActivity {
                 .setStartDelay(700)
                 .start();
 
-        // Navigate after delay
-        new Handler().postDelayed(() -> {
+        // Navigate after delay using the main looper to avoid deprecation warning
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
             startActivity(new Intent(SplashActivity.this, LoginActivity.class));
             finish();
         }, 2000);

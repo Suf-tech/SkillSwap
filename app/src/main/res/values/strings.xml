@@ -20,8 +20,8 @@
     <string name="chat_message_hint">Type a message…</string>
     <string name="chat_send">Send</string>
     <string name="edit_post_title">Edit Your Post</string>
-    <string name="edit_post_skill_have_hint">Skill you have</string>
-    <string name="edit_post_skill_want_hint">Skill you want</string>
+    <string name="edit_post_skill_have_hint">Skill you Offered</string>
+    <string name="edit_post_skill_want_hint">Skill you Wanted</string>
     <string name="edit_post_message_hint">Message</string>
     <string name="edit_post_save_changes">Save Changes</string>
     <string name="edit_post_delete_post">Delete Post</string>
@@ -45,12 +45,12 @@
     <string name="signup_confirm_password_hint">Confirm Password</string>
     <string name="signup_button">Signup</string>
     <string name="skill_selection_title">Complete Your Profile</string>
-    <string name="skill_selection_skill_have_hint">Skill you can teach</string>
-    <string name="skill_selection_skill_want_hint">Skill you want to learn</string>
+    <string name="skill_selection_skill_have_hint">Skill you can Offer</string>
+    <string name="skill_selection_skill_want_hint">Skill you Wanted</string>
     <string name="skill_selection_complete_setup">Complete Setup</string>
     <string name="add_post_title">Create New Post</string>
-    <string name="add_post_skill_have_label">Skill you have:</string>
-    <string name="add_post_skill_want_label">Skill you want:</string>
+    <string name="add_post_skill_have_label">Skill you Offered:</string>
+    <string name="add_post_skill_want_label">Skill you Wanted:</string>
     <string name="add_post_message_label">Message (Optional):</string>
     <string name="add_post_have_hint">e.g. PHP Development</string>
     <string name="add_post_want_hint">e.g. Android Development</string>
@@ -59,8 +59,8 @@
     <string name="admin_skills_search_hint">Search skills</string>
     <string name="admin_users_search_hint">Search users by name or email</string>
     <string name="home_search_hint">Search skills (e.g., Python, UI/UX)…</string>
-    <string name="detail_offering_label">OFFERING</string>
-    <string name="detail_looking_for_label">LOOKING FOR</string>
+    <string name="detail_offering_label">OFFERED</string>
+    <string name="detail_looking_for_label">WANTED</string>
     <string name="detail_message_label">MESSAGE</string>
     <string name="detail_no_message_placeholder">No additional message provided.</string>
     <string name="detail_request_note_hint">Add a note to your swap request…</string>
@@ -70,8 +70,8 @@
     <string name="identity_stats_title">Skill Swap Stats</string>
     <string name="identity_taught_count_default">0</string>
     <string name="identity_learned_count_default">0</string>
-    <string name="identity_skills_taught_label">Skills Taught</string>
-    <string name="identity_skills_learned_label">Skills Learned</string>
+    <string name="identity_skills_taught_label">Skills Offered</string>
+    <string name="identity_skills_learned_label">Skills Wanted</string>
     <string name="personal_info_title">Personal Information</string>
     <string name="personal_info_avatar_help">Tap below to change avatar</string>
     <string name="personal_info_full_name_hint">Full Name</string>
@@ -88,10 +88,10 @@
     <string name="rating_star">&#9733;</string>
     <string name="skill_item_user_name">User Name</string>
     <string name="skill_item_offering_swap">Offering a swap</string>
-    <string name="skill_item_can_teach_label">I CAN TEACH:</string>
+    <string name="skill_item_can_teach_label">I OFFERED:</string>
     <string name="skill_item_offered_placeholder">Skill Offered</string>
-    <string name="skill_item_want_to_learn_label">I WANT TO LEARN:</string>
-    <string name="skill_item_required_placeholder">Skill Required</string>
+    <string name="skill_item_want_to_learn_label">I WANTED:</string>
+    <string name="skill_item_required_placeholder">Skill Wanted</string>
     <string name="skill_item_view_details">View Details</string>
     <string name="user_detail_name_placeholder">User Name</string>
     <string name="user_detail_email_placeholder">email@example.com</string>
@@ -107,4 +107,6 @@
     <string name="nav_admin_users">Users</string>
     <string name="nav_admin_skills">Skills</string>
     <string name="nav_admin_settings">Settings</string>
+    <string name="admin_no_users_found">No users found matching \'%1$s\'</string>
+    <string name="cd_no_users_found">No users found illustration</string>
 </resources>

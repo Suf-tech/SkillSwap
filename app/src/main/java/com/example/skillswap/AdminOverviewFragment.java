@@ -2,6 +2,7 @@ package com.example.skillswap;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class AdminOverviewFragment extends Fragment {
@@ -25,6 +27,8 @@ public class AdminOverviewFragment extends Fragment {
     private DatabaseHelper db;
     private AdminDonutChartView chartRequested;
     private AdminDonutChartView chartOffered;
+    private LinearLayout legendRequested;
+    private LinearLayout legendOffered;
 
     private TextView tvTotalPosts;
     private TextView tvTotalRequests;
@@ -63,6 +67,8 @@ public class AdminOverviewFragment extends Fragment {
 
         chartRequested = view.findViewById(R.id.chartRequested);
         chartOffered = view.findViewById(R.id.chartOffered);
+        legendRequested = view.findViewById(R.id.legendRequested);
+        legendOffered = view.findViewById(R.id.legendOffered);
 
         loadSummaryStats();
         loadRequestedChart();
@@ -90,12 +96,12 @@ public class AdminOverviewFragment extends Fragment {
 
     private void loadRequestedChart() {
         Cursor cursor = db.getSkillRequestedStats();
-        setChartDataFromCursor(cursor, chartRequested, true);
+        setChartDataFromCursor(cursor, chartRequested, legendRequested, true);
     }
 
     private void loadOfferedChart() {
         Cursor cursor = db.getSkillOfferedStats();
-        setChartDataFromCursor(cursor, chartOffered, false);
+        setChartDataFromCursor(cursor, chartOffered, legendOffered, false);
     }
 
     private void loadTopSkills() {
@@ -208,9 +214,10 @@ public class AdminOverviewFragment extends Fragment {
         c.close();
     }
 
-    private void setChartDataFromCursor(Cursor cursor, AdminDonutChartView chartView, boolean requested) {
+    private void setChartDataFromCursor(Cursor cursor, AdminDonutChartView chartView, LinearLayout legendContainer, boolean requested) {
         if (cursor == null) {
             chartView.setSegments(null);
+            if (legendContainer != null) legendContainer.removeAllViews();
             return;
         }
 
@@ -223,7 +230,7 @@ public class AdminOverviewFragment extends Fragment {
                 skill = requested ? "Unknown Request" : "Unknown Skill";
             }
             skill = skill.trim();
-            int existing = counts.containsKey(skill) ? counts.get(skill) : 0;
+            int existing = (counts.get(skill) != null) ? counts.get(skill) : 0;
             counts.put(skill, existing + count);
             total += count;
         }
@@ -231,6 +238,7 @@ public class AdminOverviewFragment extends Fragment {
 
         if (total == 0 || counts.isEmpty()) {
             chartView.setSegments(null);
+            if (legendContainer != null) legendContainer.removeAllViews();
             return;
         }
 
@@ -240,7 +248,7 @@ public class AdminOverviewFragment extends Fragment {
 
         for (Map.Entry<String, Integer> entry : counts.entrySet()) {
             float pct = (float) entry.getValue() / (float) total;
-            if (pct >= 0.10f) {
+            if (pct >= 0.05f) {
                 mainLabels.add(entry.getKey());
                 mainPercents.add(pct);
             } else {
@@ -258,18 +266,51 @@ public class AdminOverviewFragment extends Fragment {
         for (float p : mainPercents) sum += p;
         if (sum <= 0f) {
             chartView.setSegments(null);
+            if (legendContainer != null) legendContainer.removeAllViews();
             return;
         }
 
         List<AdminDonutChartView.DonutSegment> segments = new ArrayList<>();
+        if (legendContainer != null) legendContainer.removeAllViews();
+
         for (int i = 0; i < mainLabels.size(); i++) {
             String label = mainLabels.get(i);
             float normalized = mainPercents.get(i) / sum;
             int color = SEGMENT_COLORS[i % SEGMENT_COLORS.length];
             segments.add(new AdminDonutChartView.DonutSegment(label, normalized, color));
+
+            if (legendContainer != null) {
+                addLegendItem(legendContainer, label, normalized, color);
+            }
         }
 
         chartView.setSegments(segments);
+    }
+
+    private void addLegendItem(LinearLayout container, String label, float percentage, int color) {
+        LinearLayout row = new LinearLayout(requireContext());
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        row.setPadding(0, 4, 0, 4);
+
+        View colorBox = new View(requireContext());
+        GradientDrawable shape = new GradientDrawable();
+        shape.setShape(GradientDrawable.OVAL);
+        shape.setColor(color);
+        colorBox.setBackground(shape);
+        int dotSize = (int) (10 * getResources().getDisplayMetrics().density);
+        LinearLayout.LayoutParams dotParams = new LinearLayout.LayoutParams(dotSize, dotSize);
+        dotParams.rightMargin = (int) (8 * getResources().getDisplayMetrics().density);
+        row.addView(colorBox, dotParams);
+
+        TextView tv = new TextView(requireContext());
+        String text = String.format(Locale.getDefault(), "%s (%.0f%%)", label, percentage * 100);
+        tv.setText(text);
+        tv.setTextSize(12);
+        tv.setTextColor(0xFF212121);
+        row.addView(tv);
+
+        container.addView(row);
     }
 
     private void setAvatar(ImageView iv, int id) {
@@ -283,4 +324,3 @@ public class AdminOverviewFragment extends Fragment {
         iv.setImageResource(res);
     }
 }
-

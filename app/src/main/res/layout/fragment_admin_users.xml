@@ -19,12 +19,44 @@
         android:singleLine="true"
         android:imeOptions="actionDone" />
 
-    <!-- Reuse only the RecyclerView; toolbar is provided by the activity -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/usersRecyclerView"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="12dp" />
+        android:layout_weight="1">
+
+        <!-- Reuse only the RecyclerView; toolbar is provided by the activity -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/usersRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp" />
+
+        <LinearLayout
+            android:id="@+id/emptyStateLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="32dp">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@android:drawable/ic_menu_search"
+                android:contentDescription="No users found"
+                android:layout_marginBottom="16dp"
+                android:alpha="0.3"/>
+
+            <TextView
+                android:id="@+id/emptyStateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No users found matching ''"
+                android:textAlignment="center"
+                android:textColor="#757575"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

@@ -8,13 +8,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 public class AdminEditUserActivity extends AppCompatActivity {
 
     private EditText editName;
-    private EditText editPass;
     private EditText editEmail;
     private ImageView currentAv;
+    private SwitchMaterial switchForceReset;
     private Button btnUpdate;
     private DatabaseHelper db;
     private String userEmail;
@@ -23,12 +24,12 @@ public class AdminEditUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_personal_info);
+        setContentView(R.layout.activity_admin_edit_user);
 
         db = new DatabaseHelper(this);
         userEmail = getIntent().getStringExtra("user_email");
 
-        Toolbar toolbar = findViewById(R.id.userDetailToolbar); // if you later add a toolbar id for this layout
+        Toolbar toolbar = findViewById(R.id.userDetailToolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
             if (getSupportActionBar() != null) {
@@ -40,7 +41,7 @@ public class AdminEditUserActivity extends AppCompatActivity {
 
         editName = findViewById(R.id.editName);
         editEmail = findViewById(R.id.editEmail);
-        editPass = findViewById(R.id.editPass);
+        switchForceReset = findViewById(R.id.switchForceReset);
         btnUpdate = findViewById(R.id.btnUpdateInfo);
         currentAv = findViewById(R.id.currentSelectedAv);
 
@@ -52,11 +53,9 @@ public class AdminEditUserActivity extends AppCompatActivity {
 
         editName.setText(db.getUserName(userEmail));
         editEmail.setText(userEmail);
-        editEmail.setEnabled(false); // admin should not change email here
-        String pass = db.getPassword(userEmail);
-        if (pass != null) {
-            editPass.setText(pass);
-        }
+        editEmail.setEnabled(false); 
+        
+        switchForceReset.setChecked(db.needsPasswordReset(userEmail));
 
         selectedAvatarId = db.getAvatarId(userEmail);
         updatePreview(selectedAvatarId);
@@ -65,15 +64,15 @@ public class AdminEditUserActivity extends AppCompatActivity {
 
         btnUpdate.setOnClickListener(v -> {
             String newName = editName.getText().toString().trim();
-            String newPass = editPass.getText().toString().trim();
+            boolean forceReset = switchForceReset.isChecked();
 
-            if (newName.isEmpty() || newPass.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            if (newName.isEmpty()) {
+                Toast.makeText(this, "Please enter a name", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (db.updateFullProfile(userEmail, newName, newPass, selectedAvatarId)) {
-                Toast.makeText(this, "User updated", Toast.LENGTH_SHORT).show();
+            if (db.adminUpdateUser(userEmail, newName, selectedAvatarId, forceReset)) {
+                Toast.makeText(this, "User updated successfully", Toast.LENGTH_SHORT).show();
                 finish();
             } else {
                 Toast.makeText(this, "Failed to update user", Toast.LENGTH_SHORT).show();
@@ -101,4 +100,3 @@ public class AdminEditUserActivity extends AppCompatActivity {
         findViewById(R.id.av6).setOnClickListener(v -> { selectedAvatarId = 6; updatePreview(6); });
     }
 }
-

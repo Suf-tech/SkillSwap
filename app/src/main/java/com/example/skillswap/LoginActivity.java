@@ -24,7 +24,6 @@ public class LoginActivity extends AppCompatActivity {
 
         db = new DatabaseHelper(this);
 
-        // Mapping IDs (Ab XML mein ye IDs maujood hain)
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         loginBtn = findViewById(R.id.loginBtn);
@@ -38,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
             if (TextUtils.isEmpty(inputEmail) || TextUtils.isEmpty(inputPass)) {
                 Toast.makeText(this, "Please enter all details!", Toast.LENGTH_SHORT).show();
             } else {
-                // First: hardcoded admin login (no session)
+                // Admin Login
                 if (inputEmail.equals("admin") && inputPass.equals("adminpass")) {
                     Intent intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
                     startActivity(intent);
@@ -46,18 +45,24 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Normal user login via database
-                boolean checkUserPass = db.checkEmailPassword(inputEmail, inputPass);
+                // Normal User Login
+                if (db.checkEmailPassword(inputEmail, inputPass)) {
+                    // Check if Admin forced a password reset
+                    if (db.needsPasswordReset(inputEmail)) {
+                        Intent intent = new Intent(LoginActivity.this, CreateNewPasswordActivity.class);
+                        intent.putExtra("user_email", inputEmail);
+                        startActivity(intent);
+                        finish();
+                        return;
+                    }
 
-                if (checkUserPass) {
-                    // Save Session
+                    // Standard login success
                     getSharedPreferences("UserSession", MODE_PRIVATE)
                             .edit()
                             .putString("user_email", inputEmail)
                             .apply();
 
                     Toast.makeText(this, "Welcome Back!", Toast.LENGTH_SHORT).show();
-
                     Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
                     startActivity(intent);
                     finish();
@@ -67,7 +72,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // Click listeners for navigation
         signupText.setOnClickListener(v -> startActivity(new Intent(this, SignupActivity.class)));
         forgetPass.setOnClickListener(v -> startActivity(new Intent(this, ForgetPasswordActivity.class)));
     }

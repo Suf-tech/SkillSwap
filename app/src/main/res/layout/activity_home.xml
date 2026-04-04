@@ -25,8 +25,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#F5F5F5"
-        app:itemIconTint="#2196F3"
-        app:itemTextColor="#2196F3"
+        app:itemIconTint="@color/nav_item_color_state"
+        app:itemTextColor="@color/nav_item_color_state"
         app:menu="@menu/bottom_nav_menu" />
 
 </RelativeLayout>

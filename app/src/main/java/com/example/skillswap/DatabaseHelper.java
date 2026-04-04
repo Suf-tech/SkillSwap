@@ -11,12 +11,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DBNAME = "SkillSwap.db";
 
     public DatabaseHelper(Context context) {
-        super(context, DBNAME, null, 6);
+        super(context, DBNAME, null, 7);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create Table users(email TEXT primary key, name TEXT, password TEXT, avatar_id INTEGER DEFAULT 0, rating_sum REAL DEFAULT 0, rating_count INTEGER DEFAULT 0)");
+        db.execSQL("create Table users(email TEXT primary key, name TEXT, password TEXT, avatar_id INTEGER DEFAULT 0, rating_sum REAL DEFAULT 0, rating_count INTEGER DEFAULT 0, requires_password_reset INTEGER DEFAULT 0)");
         db.execSQL("create Table requests(id INTEGER PRIMARY KEY AUTOINCREMENT, post_id INTEGER, sender_email TEXT, receiver_email TEXT, skill_offered TEXT, skill_required TEXT, message TEXT, status TEXT DEFAULT 'Pending', sender_rated INTEGER DEFAULT 0, receiver_rated INTEGER DEFAULT 0)");
         db.execSQL("create Table posts(id INTEGER PRIMARY KEY AUTOINCREMENT, user_email TEXT, user_name TEXT, skill_have TEXT, skill_want TEXT, message TEXT, avatar_id INTEGER, post_status TEXT DEFAULT 'Open')");
         db.execSQL("create Table messages(id INTEGER PRIMARY KEY AUTOINCREMENT, request_id INTEGER, sender_email TEXT, receiver_email TEXT, message_text TEXT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)");
@@ -24,11 +24,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("drop Table if exists users");
-        db.execSQL("drop Table if exists requests");
-        db.execSQL("drop Table if exists posts");
-        db.execSQL("drop Table if exists messages");
-        onCreate(db);
+        if (oldVersion < 7) {
+            db.execSQL("ALTER TABLE users ADD COLUMN requires_password_reset INTEGER DEFAULT 0");
+        } else {
+            db.execSQL("drop Table if exists users");
+            db.execSQL("drop Table if exists requests");
+            db.execSQL("drop Table if exists posts");
+            db.execSQL("drop Table if exists messages");
+            onCreate(db);
+        }
     }
 
     // --- 1. AUTH & FORGET PASSWORD METHODS ---
@@ -38,6 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put("email", email);
         cv.put("name", name);
         cv.put("password", password);
+        cv.put("requires_password_reset", 0);
         return db.insert("users", null, cv) != -1;
     }
 
@@ -73,6 +78,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("password", password);
+        cv.put("requires_password_reset", 0);
+        return db.update("users", cv, "email = ?", new String[]{email}) > 0;
+    }
+
+    public boolean needsPasswordReset(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("Select requires_password_reset from users where email = ?", new String[]{email});
+        boolean needsReset = false;
+        if (cursor.moveToFirst()) {
+            needsReset = cursor.getInt(0) == 1;
+        }
+        cursor.close();
+        return needsReset;
+    }
+
+    public boolean setRequiresPasswordReset(String email, boolean requires) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("requires_password_reset", requires ? 1 : 0);
         return db.update("users", cv, "email = ?", new String[]{email}) > 0;
     }
 
@@ -116,6 +140,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("password", password);
         }
         cv.put("avatar_id", avatarId);
+        return db.update("users", cv, "email = ?", new String[]{email}) > 0;
+    }
+
+    public boolean adminUpdateUser(String email, String name, int avatarId, boolean forceReset) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("name", name);
+        cv.put("avatar_id", avatarId);
+        cv.put("requires_password_reset", forceReset ? 1 : 0);
         return db.update("users", cv, "email = ?", new String[]{email}) > 0;
     }
 
