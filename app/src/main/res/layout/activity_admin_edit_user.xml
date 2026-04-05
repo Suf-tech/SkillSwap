@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/userDetailToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#FFFFFF"
+            app:titleTextColor="#2196F3" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit User Profile"
+            android:textColor="#2196F3"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/currentSelectedAv"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/editbox_background"
+            android:padding="5dp"
+            android:src="@drawable/editbox_background"
+            android:contentDescription="@string/cd_current_avatar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="@string/personal_info_avatar_help"
+            android:textColor="#757575"
+            android:textSize="12sp" />
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:columnCount="3">
+
+            <ImageView android:id="@+id/av1" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m1" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_1"/>
+            <ImageView android:id="@+id/av2" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m2" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_2"/>
+            <ImageView android:id="@+id/av3" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_m3" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_3"/>
+            <ImageView android:id="@+id/av4" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f1" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_4"/>
+            <ImageView android:id="@+id/av5" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f2" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_5"/>
+            <ImageView android:id="@+id/av6" android:layout_width="50dp" android:layout_height="50dp" android:layout_margin="5dp" android:src="@drawable/avatar_f3" android:background="@drawable/editbox_background" android:padding="3dp" android:contentDescription="@string/cd_avatar_option_6"/>
+        </GridLayout>
+
+        <EditText
+            android:id="@+id/editName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/editbox_background"
+            android:hint="@string/personal_info_full_name_hint"
+            android:padding="12dp"
+            android:textColor="#000000" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gender: "
+                android:textSize="16sp"
+                android:textColor="#757575" />
+
+            <RadioGroup
+                android:id="@+id/genderRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radioMale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Male"
+                    android:textColor="#2196F3" />
+
+                <RadioButton
+                    android:id="@+id/radioFemale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:text="Female"
+                    android:textColor="#2196F3" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/editEmail"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/editbox_background"
+            android:padding="12dp"
+            android:textColor="#757575" />
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchForceReset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Require Password Reset on Next Login"
+            android:textColor="#000000"
+            app:thumbTint="#2196F3"
+            app:trackTint="#90CAF9" />
+
+        <Button
+            android:id="@+id/btnUpdateInfo"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="30dp"
+            android:backgroundTint="#2196F3"
+            android:text="Update User Profile"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+</ScrollView>
