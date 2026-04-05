@@ -241,15 +241,7 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="189fcafb-98c5-4b66-bb17-7bdf934c4266" name="Changes" comment="Add search functionality with empty state handling to HomeFragment; update layout to include search bar and empty state UI elements.">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/skillswap/CreateNewPasswordActivity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/color/nav_item_color_state.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/nav_item_color_state.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_admin_edit_user.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_create_new_password.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/logo.png" afterDir="false" />
-    </list>
+    <list default="true" id="189fcafb-98c5-4b66-bb17-7bdf934c4266" name="Changes" comment="Add project configuration files for asset wizard settings and module management; include layout definitions and SDK path." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -517,7 +509,31 @@
       <option name="project" value="LOCAL" />
       <updated>1775270499513</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Add Create New Password feature with validation; implement UI for password entry and confirmation, and handle password update logic.">
+      <option name="closed" value="true" />
+      <created>1775417501502</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1775417501502</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Add CACHEDIR.TAG file for Gradle cache directory tagging; provide information link for cache directory tags.">
+      <option name="closed" value="true" />
+      <created>1775417562899</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1775417562899</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Add project configuration files for asset wizard settings and module management; include layout definitions and SDK path.">
+      <option name="closed" value="true" />
+      <created>1775417681092</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1775417681092</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -542,7 +558,10 @@
     <MESSAGE value="Enhance Admin Skills Fragment with search functionality, category filtering, and loading states; update UI layout with ConstraintLayout and add empty state handling." />
     <MESSAGE value="Add gender selection to user profile and signup forms; update database schema to include gender field and modify related activities for gender handling." />
     <MESSAGE value="Add search functionality with empty state handling to HomeFragment; update layout to include search bar and empty state UI elements." />
-    <option name="LAST_COMMIT_MESSAGE" value="Add search functionality with empty state handling to HomeFragment; update layout to include search bar and empty state UI elements." />
+    <MESSAGE value="Add Create New Password feature with validation; implement UI for password entry and confirmation, and handle password update logic." />
+    <MESSAGE value="Add CACHEDIR.TAG file for Gradle cache directory tagging; provide information link for cache directory tags." />
+    <MESSAGE value="Add project configuration files for asset wizard settings and module management; include layout definitions and SDK path." />
+    <option name="LAST_COMMIT_MESSAGE" value="Add project configuration files for asset wizard settings and module management; include layout definitions and SDK path." />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>
