@@ -1,26 +1,39 @@
 package com.example.skillswap;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+
 public class AdminEditUserActivity extends AppCompatActivity {
 
-    private EditText editName;
-    private EditText editEmail;
+    // Variable declaration as per XML IDs
+    private EditText editName, editEmail;
     private RadioGroup genderRadioGroup;
     private ImageView currentAv;
     private SwitchMaterial switchForceReset;
     private Button btnUpdate;
-    private DatabaseHelper db;
-    private String userEmail;
+
+    private DatabaseReference mDatabase;
+    private String targetUserId = "";
+    private String userEmailFromIntent;
     private int selectedAvatarId = 0;
 
     @Override
@@ -28,19 +41,22 @@ public class AdminEditUserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_edit_user);
 
-        db = new DatabaseHelper(this);
-        userEmail = getIntent().getStringExtra("user_email");
+        // 1. Firebase & Intent Setup
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        userEmailFromIntent = getIntent().getStringExtra("user_email");
 
+        // 2. Toolbar Setup (ID: userDetailToolbar)
         Toolbar toolbar = findViewById(R.id.userDetailToolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
             if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle("Edit User");
+                getSupportActionBar().setTitle("Edit User Profile");
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             }
             toolbar.setNavigationOnClickListener(v -> finish());
         }
 
+        // 3. Initialize XML Views
         editName = findViewById(R.id.editName);
         editEmail = findViewById(R.id.editEmail);
         genderRadioGroup = findViewById(R.id.genderRadioGroup);
@@ -48,63 +64,94 @@ public class AdminEditUserActivity extends AppCompatActivity {
         btnUpdate = findViewById(R.id.btnUpdateInfo);
         currentAv = findViewById(R.id.currentSelectedAv);
 
-        if (userEmail == null || userEmail.isEmpty()) {
-            Toast.makeText(this, "No user email provided", Toast.LENGTH_SHORT).show();
+        if (userEmailFromIntent == null || userEmailFromIntent.isEmpty()) {
+            Toast.makeText(this, "Error: User email not found", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        editName.setText(db.getUserName(userEmail));
-        editEmail.setText(userEmail);
-        editEmail.setEnabled(false); 
-        
-        String gender = db.getUserGender(userEmail);
-        if ("Female".equalsIgnoreCase(gender)) {
-            genderRadioGroup.check(R.id.radioFemale);
-        } else {
-            genderRadioGroup.check(R.id.radioMale);
-        }
+        editEmail.setText(userEmailFromIntent);
+        editEmail.setEnabled(false); // Admin email change nahi kar sakta, sirf view karega
 
-        switchForceReset.setChecked(db.needsPasswordReset(userEmail));
+        // 4. Load User Data from Firebase
+        loadUserData();
 
-        selectedAvatarId = db.getAvatarId(userEmail);
-        updatePreview(selectedAvatarId);
-
+        // 5. Setup Avatar Click Listeners (av1 to av6)
         setupAvatarClicks();
 
-        btnUpdate.setOnClickListener(v -> {
-            String newName = editName.getText().toString().trim();
-            boolean forceReset = switchForceReset.isChecked();
-
-            int selectedGenderId = genderRadioGroup.getCheckedRadioButtonId();
-            String newGender = "Male";
-            if (selectedGenderId == R.id.radioFemale) {
-                newGender = "Female";
-            }
-
-            if (newName.isEmpty()) {
-                Toast.makeText(this, "Please enter a name", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (db.adminUpdateUser(userEmail, newName, newGender, selectedAvatarId, forceReset)) {
-                Toast.makeText(this, "User updated successfully", Toast.LENGTH_SHORT).show();
-                finish();
-            } else {
-                Toast.makeText(this, "Failed to update user", Toast.LENGTH_SHORT).show();
-            }
-        });
+        // 6. Update Button Logic
+        btnUpdate.setOnClickListener(v -> performUpdate());
     }
 
-    private void updatePreview(int id) {
-        int res = R.drawable.editbox_background;
-        if (id == 1) res = R.drawable.avatar_m1;
-        else if (id == 2) res = R.drawable.avatar_m2;
-        else if (id == 3) res = R.drawable.avatar_m3;
-        else if (id == 4) res = R.drawable.avatar_f1;
-        else if (id == 5) res = R.drawable.avatar_f2;
-        else if (id == 6) res = R.drawable.avatar_f3;
-        currentAv.setImageResource(res);
+    private void loadUserData() {
+        mDatabase.child("Users").orderByChild("email").equalTo(userEmailFromIntent)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot userSnap : snapshot.getChildren()) {
+                                targetUserId = userSnap.getKey(); // UID capture
+
+                                editName.setText(userSnap.child("name").getValue(String.class));
+
+                                String gender = userSnap.child("gender").getValue(String.class);
+                                if ("Female".equalsIgnoreCase(gender)) {
+                                    genderRadioGroup.check(R.id.radioFemale);
+                                } else {
+                                    genderRadioGroup.check(R.id.radioMale);
+                                }
+
+                                if (userSnap.hasChild("avatarId")) {
+                                    selectedAvatarId = userSnap.child("avatarId").getValue(Integer.class);
+                                    updatePreview(selectedAvatarId);
+                                }
+
+                                if (userSnap.hasChild("needsReset")) {
+                                    switchForceReset.setChecked(Boolean.TRUE.equals(userSnap.child("needsReset").getValue(Boolean.class)));
+                                }
+                            }
+                        } else {
+                            Toast.makeText(AdminEditUserActivity.this, "User details not found in database", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("AdminEditError", error.getMessage());
+                    }
+                });
+    }
+
+    private void performUpdate() {
+        String newName = editName.getText().toString().trim();
+        boolean forceReset = switchForceReset.isChecked();
+
+        int selectedGenderId = genderRadioGroup.getCheckedRadioButtonId();
+        String newGender = (selectedGenderId == R.id.radioFemale) ? "Female" : "Male";
+
+        if (newName.isEmpty()) {
+            Toast.makeText(this, "Name field cannot be empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (targetUserId == null || targetUserId.isEmpty()) {
+            Toast.makeText(this, "Cannot update: User ID missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // HashMap for partial update
+        HashMap<String, Object> updateMap = new HashMap<>();
+        updateMap.put("name", newName);
+        updateMap.put("gender", newGender);
+        updateMap.put("avatarId", selectedAvatarId);
+        updateMap.put("needsReset", forceReset);
+
+        mDatabase.child("Users").child(targetUserId).updateChildren(updateMap)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Profile Updated Successfully!", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Update Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void setupAvatarClicks() {
@@ -114,5 +161,16 @@ public class AdminEditUserActivity extends AppCompatActivity {
         findViewById(R.id.av4).setOnClickListener(v -> { selectedAvatarId = 4; updatePreview(4); });
         findViewById(R.id.av5).setOnClickListener(v -> { selectedAvatarId = 5; updatePreview(5); });
         findViewById(R.id.av6).setOnClickListener(v -> { selectedAvatarId = 6; updatePreview(6); });
+    }
+
+    private void updatePreview(int id) {
+        int res = R.drawable.editbox_background; // Default
+        if (id == 1) res = R.drawable.avatar_m1;
+        else if (id == 2) res = R.drawable.avatar_m2;
+        else if (id == 3) res = R.drawable.avatar_m3;
+        else if (id == 4) res = R.drawable.avatar_f1;
+        else if (id == 5) res = R.drawable.avatar_f2;
+        else if (id == 6) res = R.drawable.avatar_f3;
+        currentAv.setImageResource(res);
     }
 }

@@ -3,90 +3,122 @@ package com.example.skillswap;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.util.Log;
 import android.widget.Toast;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class HomeActivity extends AppCompatActivity {
 
-    ViewPager2 viewPager;
-    BottomNavigationView bottomNav;
+    public ViewPager2 viewPager;
+    private BottomNavigationView bottomNav;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
 
-        Toolbar toolbar = findViewById(R.id.topToolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("SkillSwap Dashboard");
+        // 1. Session Check
+        SharedPreferences sp = getSharedPreferences("UserSession", MODE_PRIVATE);
+        boolean isLoggedIn = sp.getBoolean("isLoggedIn", false);
+
+        if (!isLoggedIn) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
         }
 
-        viewPager = findViewById(R.id.viewPager);
-        bottomNav = findViewById(R.id.bottomNavigation);
+        setContentView(R.layout.activity_home);
 
-        // 1. Attach the Adapter to ViewPager
-        ViewPagerAdapter adapter = new ViewPagerAdapter(this);
-        viewPager.setAdapter(adapter);
+        try {
+            // 2. Toolbar Setup
+            toolbar = findViewById(R.id.topToolbar);
+            if (toolbar != null) {
+                setSupportActionBar(toolbar);
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle("SkillSwap");
+                }
+            }
 
-        // 2. Handle Bottom Nav Taps
-        bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            // 3. ViewPager2 Setup
+            viewPager = findViewById(R.id.viewPager);
+            ViewPagerAdapter adapter = new ViewPagerAdapter(this);
+            viewPager.setAdapter(adapter);
+            viewPager.setOffscreenPageLimit(3);
+
+            // 4. Bottom Navigation Setup
+            bottomNav = findViewById(R.id.bottomNavigation);
+
+            bottomNav.setOnItemSelectedListener(item -> {
                 int id = item.getItemId();
-
                 if (id == R.id.nav_home) {
                     viewPager.setCurrentItem(0, true);
-                    return true;
+                    updateToolbarTitle("Dashboard");
                 } else if (id == R.id.nav_requests) {
                     viewPager.setCurrentItem(1, true);
-                    return true;
+                    updateToolbarTitle("Swap Requests");
                 } else if (id == R.id.nav_add) {
                     viewPager.setCurrentItem(2, true);
-                    return true;
+                    updateToolbarTitle("Create Post");
                 } else if (id == R.id.nav_profile) {
                     viewPager.setCurrentItem(3, true);
-                    return true;
+                    updateToolbarTitle("My Profile");
                 } else if (id == R.id.nav_logout) {
                     handleLogout();
-                    return false; // Don't highlight the logout icon
+                    return false;
                 }
-                return false;
-            }
-        });
+                return true;
+            });
 
-        // 3. Handle Screen Swipes to update Bottom Nav icon
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                switch (position) {
-                    case 0:
-                        bottomNav.getMenu().findItem(R.id.nav_home).setChecked(true);
-                        break;
-                    case 1:
-                        bottomNav.getMenu().findItem(R.id.nav_requests).setChecked(true);
-                        break;
-                    case 2:
-                        bottomNav.getMenu().findItem(R.id.nav_add).setChecked(true);
-                        break;
-                    case 3:
-                        bottomNav.getMenu().findItem(R.id.nav_profile).setChecked(true);
-                        break;
+            // 5. Swipe Callback
+            viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+                @Override
+                public void onPageSelected(int position) {
+                    super.onPageSelected(position);
+                    if (position < 4) {
+                        bottomNav.getMenu().getItem(position).setChecked(true);
+                        switch (position) {
+                            case 0: updateToolbarTitle("Dashboard"); break;
+                            case 1: updateToolbarTitle("Swap Requests"); break;
+                            case 2: updateToolbarTitle("Create Post"); break;
+                            case 3: updateToolbarTitle("My Profile"); break;
+                        }
+                    }
                 }
-            }
-        });
+            });
+
+            // --- NAYA BACK PRESS LOGIC (FIXED BRACKETS) ---
+            getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+                @Override
+                public void handleOnBackPressed() {
+                    if (viewPager != null && viewPager.getCurrentItem() != 0) {
+                        viewPager.setCurrentItem(0, true);
+                    } else {
+                        setEnabled(false);
+                        finish();
+                    }
+                }
+            });
+
+        } catch (Exception e) {
+            Log.e("HomeActivityError", "Error: " + e.getMessage());
+        }
+    }
+
+    private void updateToolbarTitle(String title) {
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(title);
+        }
     }
 
     private void handleLogout() {
-        SharedPreferences sp = getSharedPreferences("UserSession", MODE_PRIVATE);
-        sp.edit().clear().apply();
+        FirebaseAuth.getInstance().signOut();
+        getSharedPreferences("UserSession", MODE_PRIVATE).edit().clear().apply();
         Toast.makeText(HomeActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -13,47 +13,39 @@ import java.util.List;
 
 public class AdminSkillRequesterAdapter extends RecyclerView.Adapter<AdminSkillRequesterAdapter.ViewHolder> {
 
-    private final List<AdminSkillRequester> data;
+    private final List<AdminSkillRequester> requesterList;
 
-    public AdminSkillRequesterAdapter(List<AdminSkillRequester> data) {
-        this.data = data;
+    public AdminSkillRequesterAdapter(List<AdminSkillRequester> requesterList) {
+        this.requesterList = requesterList;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // XML ID: item_admin_skill_requester (Aapki di hui layout)
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_admin_skill_requester, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        AdminSkillRequester item = data.get(position);
-        holder.name.setText(item.name);
-        holder.email.setText(item.email);
-        setAvatar(holder.avatar, item.avatarId);
+        AdminSkillRequester requester = requesterList.get(position);
+
+        // 1. Set Text Data (Sync with XML IDs)
+        holder.name.setText(requester.name != null ? requester.name : "Unknown User");
+        holder.email.setText(requester.email != null ? requester.email : "No Email");
+
+        // 2. Set Avatar Logic
+        setAvatar(holder.avatar, requester.avatarId);
     }
 
     @Override
     public int getItemCount() {
-        return data.size();
-    }
-
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView name;
-        TextView email;
-        ImageView avatar;
-
-        ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            name = itemView.findViewById(R.id.requesterName);
-            email = itemView.findViewById(R.id.requesterEmail);
-            avatar = itemView.findViewById(R.id.requesterAvatar);
-        }
+        return requesterList.size();
     }
 
     private void setAvatar(ImageView iv, int id) {
-        int res = R.drawable.editbox_background;
+        int res = R.drawable.editbox_background; // Default background
         if (id == 1) res = R.drawable.avatar_m1;
         else if (id == 2) res = R.drawable.avatar_m2;
         else if (id == 3) res = R.drawable.avatar_m3;
@@ -62,5 +54,17 @@ public class AdminSkillRequesterAdapter extends RecyclerView.Adapter<AdminSkillR
         else if (id == 6) res = R.drawable.avatar_f3;
         iv.setImageResource(res);
     }
-}
 
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView avatar;
+        TextView name, email;
+
+        ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            // In IDs ko aapki XML ke mutabiq sync kar diya gaya hai
+            avatar = itemView.findViewById(R.id.requesterAvatar);
+            name = itemView.findViewById(R.id.requesterName);
+            email = itemView.findViewById(R.id.requesterEmail);
+        }
+    }
+}

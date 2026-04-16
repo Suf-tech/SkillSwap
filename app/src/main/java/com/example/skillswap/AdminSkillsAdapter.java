@@ -4,15 +4,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class AdminSkillsAdapter extends RecyclerView.Adapter<AdminSkillsAdapter.ViewHolder> {
 
+    // Interface: Ab ye AdminSkillItem pass karega (Audit View ke liye)
     public interface OnSkillClickListener {
         void onSkillClick(AdminSkillItem skill);
     }
@@ -28,6 +27,7 @@ public class AdminSkillsAdapter extends RecyclerView.Adapter<AdminSkillsAdapter.
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // XML ID: item_admin_skill (Jo audit tags wali XML thi)
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_admin_skill, parent, false);
         return new ViewHolder(view);
     }
@@ -35,32 +35,19 @@ public class AdminSkillsAdapter extends RecyclerView.Adapter<AdminSkillsAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AdminSkillItem item = skills.get(position);
+
+        // 1. Set Main Data
         holder.skillName.setText(item.getName());
         holder.skillCount.setText(item.getCount() + " uses");
 
-        // ...existing tag visibility logic...
-        if (item.isRequested()) {
-            holder.tagRequested.setVisibility(View.VISIBLE);
-        } else {
-            holder.tagRequested.setVisibility(View.GONE);
-        }
+        // 2. Tags visibility (Audit Tags)
+        holder.tagRequested.setVisibility(item.isRequested() ? View.VISIBLE : View.GONE);
+        holder.tagWanted.setVisibility(item.isWanted() ? View.VISIBLE : View.GONE);
+        holder.tagOffered.setVisibility(item.isOffered() ? View.VISIBLE : View.GONE);
 
-        if (item.isWanted()) {
-            holder.tagWanted.setVisibility(View.VISIBLE);
-        } else {
-            holder.tagWanted.setVisibility(View.GONE);
-        }
-
-        if (item.isOffered()) {
-            holder.tagOffered.setVisibility(View.VISIBLE);
-        } else {
-            holder.tagOffered.setVisibility(View.GONE);
-        }
-
+        // 3. Item Click
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onSkillClick(item);
-            }
+            if (listener != null) listener.onSkillClick(item);
         });
     }
 
@@ -76,11 +63,7 @@ public class AdminSkillsAdapter extends RecyclerView.Adapter<AdminSkillsAdapter.
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView skillName;
-        TextView skillCount;
-        TextView tagRequested;
-        TextView tagWanted;
-        TextView tagOffered;
+        TextView skillName, skillCount, tagRequested, tagWanted, tagOffered;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -92,4 +75,3 @@ public class AdminSkillsAdapter extends RecyclerView.Adapter<AdminSkillsAdapter.
         }
     }
 }
-

@@ -1,51 +1,62 @@
 package com.example.skillswap;
 
 import android.os.Bundle;
-import android.widget.Button;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.database.Cursor;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class UserDetailActivity extends AppCompatActivity {
 
-    private DatabaseHelper db;
-    private String userEmail;
-    private String userName;
+    // XML IDs: userDetailToolbar, userDetailAvatar, userDetailName, userDetailGender, userDetailEmail, containerUserPosts, containerUserRequests
+    private DatabaseReference mDatabase;
+    private String userEmail, userId, userName;
     private int avatarId;
 
     private ImageView profileAvatar;
-    private TextView profileName;
-    private TextView profileGender;
-    private TextView profileEmail;
-    private LinearLayout containerUserPosts;
-    private LinearLayout containerUserRequests;
+    private TextView profileName, profileGender, profileEmail;
+    private LinearLayout containerUserPosts, containerUserRequests;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail);
 
-        db = new DatabaseHelper(this);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        // 1. Intent Data capture (Sync with Admin/Home activities)
+        // Check both common keys to prevent null userId
+        userId = getIntent().getStringExtra("user_id");
+        if (userId == null) userId = getIntent().getStringExtra("uid");
 
         userEmail = getIntent().getStringExtra("user_email");
         userName = getIntent().getStringExtra("user_name");
         avatarId = getIntent().getIntExtra("avatar_id", 0);
 
+        // 2. Toolbar Setup
         Toolbar toolbar = findViewById(R.id.userDetailToolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("User Profile");
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("User Profile Audit");
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+            toolbar.setNavigationOnClickListener(v -> finish());
         }
-        toolbar.setNavigationOnClickListener(v -> finish());
 
+        // 3. Bind Views (Sync with XML IDs)
         profileAvatar = findViewById(R.id.userDetailAvatar);
         profileName = findViewById(R.id.userDetailName);
         profileGender = findViewById(R.id.userDetailGender);
@@ -53,108 +64,119 @@ public class UserDetailActivity extends AppCompatActivity {
         containerUserPosts = findViewById(R.id.containerUserPosts);
         containerUserRequests = findViewById(R.id.containerUserRequests);
 
-        if (userName == null || userName.isEmpty()) {
-            userName = db.getUserName(userEmail);
-        }
-
-        profileName.setText(userName);
-        profileEmail.setText(userEmail);
-        
-        String gender = db.getUserGender(userEmail);
-        profileGender.setText("Gender: " + gender);
-
+        // 4. Set Initial Data
+        profileName.setText(userName != null ? userName : "SkillSwap Member");
+        profileEmail.setText(userEmail != null ? userEmail : "No email found");
         setAvatar(profileAvatar, avatarId);
 
-        loadUserPosts();
-        loadUserRequests();
-    }
-
-    private void loadUserPosts() {
-        containerUserPosts.removeAllViews();
-        Cursor cursor = db.getPostsByUser(userEmail);
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                int postId = cursor.getInt(0);
-                String have = cursor.getString(1);
-                String want = cursor.getString(2);
-                String msg = cursor.getString(3);
-                String status = cursor.getString(4);
-
-                LinearLayout row = (LinearLayout) getLayoutInflater().inflate(R.layout.item_admin_user_post, containerUserPosts, false);
-                TextView tvHave = row.findViewById(R.id.postHave);
-                TextView tvWant = row.findViewById(R.id.postWant);
-                TextView tvMsg = row.findViewById(R.id.postMsg);
-                TextView tvStatus = row.findViewById(R.id.postStatus);
-                Button btnDelete = row.findViewById(R.id.btnDeletePost);
-
-                tvHave.setText("Offered: " + have);
-                tvWant.setText("Wanted: " + want);
-                tvMsg.setText(msg == null ? "" : msg);
-                tvStatus.setText(status);
-
-                btnDelete.setOnClickListener(v -> {
-                    new AlertDialog.Builder(this)
-                            .setTitle("Delete Post")
-                            .setMessage("Are you sure you want to delete this post? This action cannot be undone.")
-                            .setPositiveButton("Delete", (dialog, which) -> {
-                                if (db.deletePost(postId)) {
-                                    containerUserPosts.removeView(row);
-                                    Toast.makeText(this, "Post deleted", Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                            .setNegativeButton("Cancel", null)
-                            .show();
-                });
-
-                containerUserPosts.addView(row);
-            }
-            cursor.close();
+        // 5. Load Live Data from Firebase
+        if (userId != null && !userId.isEmpty()) {
+            loadUserBasicInfo();
+            loadUserPostsFromFirebase();
+            loadUserRequestsFromFirebase();
+        } else {
+            Toast.makeText(this, "Critical Error: User ID is missing!", Toast.LENGTH_LONG).show();
+            finish();
         }
     }
 
-    private void loadUserRequests() {
-        containerUserRequests.removeAllViews();
-        Cursor cursor = db.getRequestsByUser(userEmail);
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                int reqId = cursor.getInt(0);
-                String sender = cursor.getString(2);
-                String receiver = cursor.getString(3);
-                String offered = cursor.getString(4);
-                String required = cursor.getString(5);
-                String msg = cursor.getString(6);
-                String status = cursor.getString(7);
+    private void loadUserBasicInfo() {
+        mDatabase.child("Users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String gender = snapshot.child("gender").getValue(String.class);
+                    profileGender.setText("Gender: " + (gender != null ? gender : "Not Specified"));
 
-                LinearLayout row = (LinearLayout) getLayoutInflater().inflate(R.layout.item_admin_user_request, containerUserRequests, false);
-                TextView tvDirection = row.findViewById(R.id.reqDirection);
-                TextView tvSkills = row.findViewById(R.id.reqSkills);
-                TextView tvMsg = row.findViewById(R.id.reqMsg);
-                TextView tvStatus = row.findViewById(R.id.reqStatusAdmin);
-                Button btnDelete = row.findViewById(R.id.btnDeleteRequest);
-
-                tvDirection.setText(sender + " → " + receiver);
-                tvSkills.setText("Offered: " + offered + "  |  Wanted: " + required);
-                tvMsg.setText(msg == null ? "" : msg);
-                tvStatus.setText(status);
-
-                btnDelete.setOnClickListener(v -> {
-                    new AlertDialog.Builder(this)
-                            .setTitle("Delete Request")
-                            .setMessage("Are you sure you want to delete this request? This action cannot be undone.")
-                            .setPositiveButton("Delete", (dialog, which) -> {
-                                if (db.deleteRequest(reqId)) {
-                                    containerUserRequests.removeView(row);
-                                    Toast.makeText(this, "Request deleted", Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                            .setNegativeButton("Cancel", null)
-                            .show();
-                });
-
-                containerUserRequests.addView(row);
+                    // Agar avatarId intent mein purana tha to yahan refresh karein
+                    if (snapshot.hasChild("avatarId")) {
+                        avatarId = snapshot.child("avatarId").getValue(Integer.class);
+                        setAvatar(profileAvatar, avatarId);
+                    }
+                }
             }
-            cursor.close();
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void loadUserPostsFromFirebase() {
+        mDatabase.child("Posts").orderByChild("userId").equalTo(userId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        containerUserPosts.removeAllViews();
+                        for (DataSnapshot postSnap : snapshot.getChildren()) {
+                            String postId = postSnap.getKey();
+                            String have = postSnap.child("have").getValue(String.class);
+                            String want = postSnap.child("want").getValue(String.class);
+
+                            // Check if post is active
+                            boolean isOpen = !postSnap.hasChild("isOpen") || Boolean.TRUE.equals(postSnap.child("isOpen").getValue(Boolean.class));
+                            String status = isOpen ? "Active" : "Locked (Swap Accepted)";
+
+                            View row = getLayoutInflater().inflate(R.layout.item_admin_user_post, containerUserPosts, false);
+                            ((TextView) row.findViewById(R.id.postHave)).setText("Offered: " + have);
+                            ((TextView) row.findViewById(R.id.postWant)).setText("Wanted: " + want);
+                            ((TextView) row.findViewById(R.id.postStatus)).setText(status);
+
+                            row.findViewById(R.id.btnDeletePost).setOnClickListener(v -> {
+                                deleteItem("Posts", postId, "Post removed from database");
+                            });
+
+                            containerUserPosts.addView(row);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+    }
+
+    private void loadUserRequestsFromFirebase() {
+        mDatabase.child("Requests").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                containerUserRequests.removeAllViews();
+                for (DataSnapshot reqSnap : snapshot.getChildren()) {
+                    String senderId = reqSnap.child("senderId").getValue(String.class);
+                    String receiverId = reqSnap.child("receiverId").getValue(String.class);
+
+                    // User involve hai ya nahi (as sender or receiver)
+                    if (userId.equals(senderId) || userId.equals(receiverId)) {
+                        String reqId = reqSnap.getKey();
+                        String senderName = reqSnap.child("senderName").getValue(String.class);
+                        String receiverName = reqSnap.child("receiverName").getValue(String.class);
+                        String status = reqSnap.child("status").getValue(String.class);
+
+                        View row = getLayoutInflater().inflate(R.layout.item_admin_user_request, containerUserRequests, false);
+                        ((TextView) row.findViewById(R.id.reqDirection)).setText(senderName + " → " + receiverName);
+                        ((TextView) row.findViewById(R.id.reqStatusAdmin)).setText("Status: " + status);
+
+                        row.findViewById(R.id.btnDeleteRequest).setOnClickListener(v -> {
+                            deleteItem("Requests", reqId, "Swap request deleted");
+                        });
+
+                        containerUserRequests.addView(row);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void deleteItem(String node, String id, String successMsg) {
+        new AlertDialog.Builder(this)
+                .setTitle("Admin Control: Delete")
+                .setMessage("Are you sure? This action cannot be undone.")
+                .setPositiveButton("Confirm Delete", (dialog, which) -> {
+                    mDatabase.child(node).child(id).removeValue().addOnSuccessListener(aVoid -> {
+                        Toast.makeText(UserDetailActivity.this, successMsg, Toast.LENGTH_SHORT).show();
+                    });
+                })
+                .setNegativeButton("Keep It", null)
+                .setIcon(android.R.drawable.ic_menu_delete)
+                .show();
     }
 
     private void setAvatar(ImageView iv, int id) {

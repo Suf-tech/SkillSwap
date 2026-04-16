@@ -32,6 +32,7 @@ public class AdminUsersAdapter extends RecyclerView.Adapter<AdminUsersAdapter.Vi
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // XML name: item_admin_user.xml
         View view = LayoutInflater.from(context).inflate(R.layout.item_admin_user, parent, false);
         return new ViewHolder(view);
     }
@@ -39,11 +40,18 @@ public class AdminUsersAdapter extends RecyclerView.Adapter<AdminUsersAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AdminUser user = users.get(position);
-        holder.name.setText(user.name);
-        holder.email.setText(user.email);
+
+        // Data binding with XML IDs
+        holder.name.setText(user.name != null ? user.name : "Unknown");
+        holder.email.setText(user.email != null ? user.email : "No Email");
+
+        // Avatar setup
         setAvatar(holder.avatar, user.avatarId);
 
+        // Click on entire card for details
         holder.itemView.setOnClickListener(v -> listener.onUserClick(user));
+
+        // Click on edit icon specifically (ID: adminUserEdit)
         holder.edit.setOnClickListener(v -> listener.onUserEditClick(user));
     }
 
@@ -59,13 +67,12 @@ public class AdminUsersAdapter extends RecyclerView.Adapter<AdminUsersAdapter.Vi
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView name;
-        TextView email;
-        ImageView avatar;
-        ImageView edit;
+        TextView name, email;
+        ImageView avatar, edit;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
+            // Sync with your XML IDs exactly
             name = itemView.findViewById(R.id.adminUserName);
             email = itemView.findViewById(R.id.adminUserEmail);
             avatar = itemView.findViewById(R.id.adminUserAvatar);
@@ -74,7 +81,7 @@ public class AdminUsersAdapter extends RecyclerView.Adapter<AdminUsersAdapter.Vi
     }
 
     private void setAvatar(ImageView iv, int id) {
-        int res = R.drawable.editbox_background;
+        int res = R.drawable.editbox_background; // Default
         if (id == 1) res = R.drawable.avatar_m1;
         else if (id == 2) res = R.drawable.avatar_m2;
         else if (id == 3) res = R.drawable.avatar_m3;

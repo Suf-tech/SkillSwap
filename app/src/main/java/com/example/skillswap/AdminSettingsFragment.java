@@ -15,18 +15,19 @@ public class AdminSettingsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Aapki XML (fragment_admin_settings.xml) ko inflate kar raha hai
         return inflater.inflate(R.layout.fragment_admin_settings, container, false);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        // Toolbar ka title update karein taake Admin ko pata chale wo kis section mein hai
         if (getActivity() instanceof AppCompatActivity) {
             AppCompatActivity activity = (AppCompatActivity) getActivity();
             if (activity.getSupportActionBar() != null) {
-                activity.getSupportActionBar().setTitle("Settings");
+                activity.getSupportActionBar().setTitle("Admin Settings");
             }
         }
     }
 }
-

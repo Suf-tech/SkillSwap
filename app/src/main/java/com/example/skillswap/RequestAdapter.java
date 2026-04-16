@@ -10,22 +10,35 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestAdapter extends BaseAdapter {
     Context context;
     ArrayList<RequestModel> list;
-    String currentUser;
-    DatabaseHelper db;
+    String currentUserId;
+    DatabaseReference mDatabase;
 
-    public RequestAdapter(Context context, ArrayList<RequestModel> list, String currentUser) {
+    public RequestAdapter(Context context, ArrayList<RequestModel> list, String currentUserId) {
         this.context = context;
         this.list = list;
-        this.currentUser = currentUser;
-        this.db = new DatabaseHelper(context);
+        this.currentUserId = currentUserId;
+        this.mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
@@ -56,109 +69,159 @@ public class RequestAdapter extends BaseAdapter {
         Button btnComplete = view.findViewById(R.id.btnComplete);
         Button btnRate = view.findViewById(R.id.btnRate);
 
-        boolean isSender = req.getSender().equalsIgnoreCase(currentUser);
-        String otherUserEmail = isSender ? req.getReceiver() : req.getSender();
-        boolean hasRated = isSender ? (req.getSenderRated() == 1) : (req.getReceiverRated() == 1);
+        if (req == null) return view;
 
-        status.setText(req.getStatus());
-        if(req.getStatus().equals("Accepted")) status.setTextColor(Color.parseColor("#4CAF50"));
-        else if(req.getStatus().equals("Completed")) status.setTextColor(Color.parseColor("#9C27B0"));
-        else if(req.getStatus().equals("Rejected")) status.setTextColor(Color.parseColor("#F44336"));
+        boolean isSender = req.getSenderId() != null && req.getSenderId().equals(currentUserId);
+        String otherUserId = isSender ? req.getReceiverId() : req.getSenderId();
+        String currentStatus = req.getStatus() != null ? req.getStatus() : "pending";
+
+        status.setText(currentStatus.toUpperCase());
+
+        if(currentStatus.equalsIgnoreCase("Accepted")) status.setTextColor(Color.parseColor("#4CAF50"));
+        else if(currentStatus.equalsIgnoreCase("Completed")) status.setTextColor(Color.parseColor("#9C27B0"));
+        else if(currentStatus.equalsIgnoreCase("Rejected")) status.setTextColor(Color.parseColor("#F44336"));
         else status.setTextColor(Color.parseColor("#FF9800"));
 
         if (isSender) {
-            type.setText("OUTGOING");
+            type.setText("OUTGOING REQUEST");
             type.setTextColor(Color.parseColor("#4CAF50"));
-            userEmail.setText("To: " + req.getReceiver());
+            userEmail.setText("To: " + (req.getReceiverName() != null ? req.getReceiverName() : req.getReceiverEmail()));
         } else {
-            type.setText("INCOMING");
+            type.setText("INCOMING REQUEST");
             type.setTextColor(Color.parseColor("#2196F3"));
-            userEmail.setText("From: " + req.getSender());
+            userEmail.setText("From: " + (req.getSenderName() != null ? req.getSenderName() : req.getSenderEmail()));
         }
 
         details.setText("Wants: " + req.getRequired() + "\nOffers: " + req.getOffered());
         message.setText("\"" + req.getMsg() + "\"");
 
-        // Hide buttons for recycling
+        // --- VISIBILITY LOGIC ---
+        actionLayout.setVisibility(View.GONE);
         btnAccept.setVisibility(View.GONE);
         btnReject.setVisibility(View.GONE);
         btnChat.setVisibility(View.GONE);
         btnComplete.setVisibility(View.GONE);
         btnRate.setVisibility(View.GONE);
-        actionLayout.setVisibility(View.GONE);
 
-        // Lifecycle Visibility Logic
-        if (req.getStatus().equals("Accepted")) {
+        if (currentStatus.equalsIgnoreCase("Accepted")) {
             actionLayout.setVisibility(View.VISIBLE);
             btnChat.setVisibility(View.VISIBLE);
             btnComplete.setVisibility(View.VISIBLE);
-        } else if (req.getStatus().equals("Completed")) {
+        } else if (currentStatus.equalsIgnoreCase("Completed")) {
             actionLayout.setVisibility(View.VISIBLE);
-            btnChat.setVisibility(View.VISIBLE);
-            // Only show rating button if they haven't rated yet!
-            if (!hasRated) {
-                btnRate.setVisibility(View.VISIBLE);
-            }
-        } else if (req.getStatus().equals("Pending") && !isSender) {
+            btnChat.setVisibility(View.GONE); // Chat hidden
+
+            // --- RATING ACCESS LOGIC ---
+            // Check if this user has already rated this request
+            mDatabase.child("Ratings").child(otherUserId).child(req.getId())
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                btnRate.setVisibility(View.GONE); // Already rated
+                            } else {
+                                btnRate.setVisibility(View.VISIBLE); // Not rated yet
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+        } else if (currentStatus.equalsIgnoreCase("pending") && !isSender) {
             actionLayout.setVisibility(View.VISIBLE);
             btnAccept.setVisibility(View.VISIBLE);
             btnReject.setVisibility(View.VISIBLE);
         }
 
-        // --- Action Listeners ---
-        btnAccept.setOnClickListener(v -> {
-            if (db.updateRequestStatus(req.getId(), "Accepted")) {
-                db.closePost(req.getPostId()); // FIX: Hides the post from the dashboard!
-                req.setStatus("Accepted");
-                notifyDataSetChanged();
-            }
-        });
-
-        btnReject.setOnClickListener(v -> {
-            if (db.updateRequestStatus(req.getId(), "Rejected")) {
-                req.setStatus("Rejected");
-                notifyDataSetChanged();
-            }
-        });
+        // --- LISTENERS ---
+        btnAccept.setOnClickListener(v -> updateStatus(req.getId(), "Accepted", req.getPostId()));
+        btnReject.setOnClickListener(v -> updateStatus(req.getId(), "Rejected", null));
 
         btnChat.setOnClickListener(v -> {
             Intent intent = new Intent(context, ChatActivity.class);
-            intent.putExtra("chat_with_email", otherUserEmail);
-            intent.putExtra("request_id", req.getId()); // FIX: Pass specific session ID
-            intent.putExtra("isCompleted", req.getStatus().equals("Completed"));
+            intent.putExtra("chat_with_id", otherUserId);
+            intent.putExtra("request_id", req.getId());
+            intent.putExtra("chat_with_name", isSender ? req.getReceiverName() : req.getSenderName());
             context.startActivity(intent);
         });
 
-        btnComplete.setOnClickListener(v -> {
-            if (db.updateRequestStatus(req.getId(), "Completed")) {
-                req.setStatus("Completed");
-                notifyDataSetChanged();
-                Toast.makeText(context, "Swap Completed!", Toast.LENGTH_SHORT).show();
-                if (!hasRated) btnRate.performClick();
-            }
-        });
+        btnComplete.setOnClickListener(v -> updateStatus(req.getId(), "Completed", null));
 
-        btnRate.setOnClickListener(v -> {
-            CharSequence[] options = {"1 Star (Poor)", "2 Stars", "3 Stars", "4 Stars", "5 Stars (Excellent)"};
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Rate " + db.getUserName(otherUserEmail));
-            builder.setItems(options, (dialog, which) -> {
-                float ratingValue = which + 1.0f;
-                if (db.rateUser(otherUserEmail, ratingValue)) {
-                    // Lock the rating permanently
-                    db.markAsRated(req.getId(), isSender);
-                    if (isSender) req.setSenderRated(1);
-                    else req.setReceiverRated(1);
-
-                    notifyDataSetChanged();
-                    Toast.makeText(context, "Rating submitted!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(context, "Error submitting rating.", Toast.LENGTH_SHORT).show();
-                }
-            });
-            builder.show();
-        });
+        btnRate.setOnClickListener(v -> showRatingDialog(req));
 
         return view;
+    }
+
+    private void showRatingDialog(RequestModel req) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_rating, null);
+        builder.setView(dialogView);
+
+        RatingBar ratingBar = dialogView.findViewById(R.id.dialogRatingBar);
+        EditText commentInput = dialogView.findViewById(R.id.dialogComment);
+        Button btnSubmit = dialogView.findViewById(R.id.btnSubmitRating);
+
+        AlertDialog dialog = builder.create();
+
+        btnSubmit.setOnClickListener(v -> {
+            float ratingValue = ratingBar.getRating();
+            String comment = commentInput.getText().toString().trim();
+
+            if (ratingValue == 0) {
+                Toast.makeText(context, "Please select stars", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String targetUserId = currentUserId.equals(req.getSenderId()) ? req.getReceiverId() : req.getSenderId();
+            String myName = currentUserId.equals(req.getSenderId()) ? req.getSenderName() : req.getReceiverName();
+
+            HashMap<String, Object> ratingMap = new HashMap<>();
+            ratingMap.put("rating", ratingValue);
+            ratingMap.put("comment", comment);
+            ratingMap.put("fromName", myName);
+            ratingMap.put("fromId", currentUserId);
+            ratingMap.put("timestamp", System.currentTimeMillis());
+
+            mDatabase.child("Ratings").child(targetUserId).child(req.getId()).setValue(ratingMap)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(context, "Rating Submitted!", Toast.LENGTH_SHORT).show();
+                        // Refresh the list to hide the rate button immediately
+                        notifyDataSetChanged();
+                        dialog.dismiss();
+                    });
+        });
+        dialog.show();
+    }
+
+    private void updateStatus(String requestId, String newStatus, String postId) {
+        if (requestId == null) return;
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("status", newStatus);
+
+        mDatabase.child("Requests").child(requestId).updateChildren(updates).addOnSuccessListener(aVoid -> {
+            if (newStatus.equalsIgnoreCase("Accepted")) {
+                if (postId != null) {
+                    mDatabase.child("Posts").child(postId).child("isOpen").setValue(false);
+                }
+
+                // Close all other posts for the current user too
+                mDatabase.child("Posts").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            String postUserId = ds.child("userId").getValue(String.class);
+                            Boolean isOpen = ds.child("isOpen").getValue(Boolean.class);
+
+                            if (postUserId != null && postUserId.equals(currentUserId) && isOpen != null && isOpen) {
+                                ds.getRef().child("isOpen").setValue(false);
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {}
+                });
+            }
+            Toast.makeText(context, "Request " + newStatus, Toast.LENGTH_SHORT).show();
+        });
     }
 }
