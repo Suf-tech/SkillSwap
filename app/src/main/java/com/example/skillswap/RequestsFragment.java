@@ -29,45 +29,44 @@ public class RequestsFragment extends Fragment {
     private RequestAdapter adapter;
 
     private DatabaseReference mDatabase;
+    private ValueEventListener requestsListener;
     private String currentUserId;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // fragment_requests.xml inflate karein
         View view = inflater.inflate(R.layout.fragment_requests, container, false);
 
-        // 1. Session Initialization
         SharedPreferences sp = requireContext().getSharedPreferences("UserSession", Context.MODE_PRIVATE);
         currentUserId = sp.getString("userId", "");
 
-        // 2. View Bindings
         requestListView = view.findViewById(R.id.requestListView);
         requestList = new ArrayList<>();
+        adapter = new RequestAdapter(requireContext(), requestList, currentUserId, RequestAdapter.Mode.ACTIVE);
+        requestListView.setAdapter(adapter);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Requests");
-
-        // 3. Adapter Setup
-        if (isAdded()) {
-            adapter = new RequestAdapter(requireContext(), requestList, currentUserId);
-            requestListView.setAdapter(adapter);
-
-            if (!currentUserId.isEmpty()) {
-                loadRequestsFromFirebase();
-            } else {
-                Toast.makeText(requireContext(), "Session Error: Please Login", Toast.LENGTH_SHORT).show();
-            }
-        }
-
         return view;
     }
 
-    private void loadRequestsFromFirebase() {
-        // Real-time listener: Jab status change hogi (Accept/Reject), list khud refresh ho jayegi
-        mDatabase.addValueEventListener(new ValueEventListener() {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if (!currentUserId.isEmpty()) {
+            attachRequestsListener();
+        } else if (isAdded()) {
+            Toast.makeText(requireContext(), "Session Error: Please Login", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void attachRequestsListener() {
+        if (requestsListener != null) return;
+
+        requestsListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!isAdded()) return; // Fragment safety: Crash prevention
+                if (!isAdded()) return;
 
                 requestList.clear();
                 for (DataSnapshot data : snapshot.getChildren()) {
@@ -76,9 +75,13 @@ public class RequestsFragment extends Fragment {
                         if (req != null) {
                             String senderId = req.getSenderId();
                             String receiverId = req.getReceiverId();
+                            String status = req.getStatus();
 
-                            // Logic: Sirf wahi requests dikhayen jahan current user sender ya receiver ho
-                            if (currentUserId.equals(senderId) || currentUserId.equals(receiverId)) {
+                            boolean isInvolvedUser = currentUserId.equals(senderId) || currentUserId.equals(receiverId);
+                            boolean isHistoryStatus = RequestModel.STATUS_COMPLETED.equals(status)
+                                    || RequestModel.STATUS_REJECTED.equals(status);
+
+                            if (isInvolvedUser && !isHistoryStatus) {
                                 requestList.add(req);
                             }
                         }
@@ -98,6 +101,17 @@ public class RequestsFragment extends Fragment {
                     Toast.makeText(requireContext(), "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        };
+
+        mDatabase.addValueEventListener(requestsListener);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mDatabase != null && requestsListener != null) {
+            mDatabase.removeEventListener(requestsListener);
+            requestsListener = null;
+        }
     }
 }

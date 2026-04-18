@@ -149,7 +149,7 @@ public class DetailActivity extends AppCompatActivity {
             requestMap.put("offered", postTitle); // Model Sync
             requestMap.put("required", fullWant); // Model Sync
             requestMap.put("msg", customMsg);      // Model Sync
-            requestMap.put("status", "pending");
+            requestMap.put("status", RequestModel.STATUS_PENDING);
             requestMap.put("timestamp", System.currentTimeMillis());
 
             mDatabase.child("Requests").child(requestId).setValue(requestMap)

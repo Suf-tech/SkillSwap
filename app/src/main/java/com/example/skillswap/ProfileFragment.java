@@ -22,6 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Locale;
+
 public class ProfileFragment extends Fragment {
 
     // XML IDs matching fragment_profile.xml
@@ -29,7 +31,10 @@ public class ProfileFragment extends Fragment {
     private TextView profileName, profileEmail, profileRating;
     private LinearLayout btnPersonalInfo, btnIdentity, btnTheme;
 
-    private DatabaseReference mDatabase;
+    private DatabaseReference mUserRef;
+    private DatabaseReference mRatingsRef;
+    private ValueEventListener userListener;
+    private ValueEventListener ratingsListener;
     private String currentUserId, userName, userEmail;
     private int avatarId = 0;
 
@@ -53,8 +58,10 @@ public class ProfileFragment extends Fragment {
         btnTheme = view.findViewById(R.id.btnTheme);
 
         if (!currentUserId.isEmpty()) {
-            mDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
+            mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(currentUserId);
+            mRatingsRef = FirebaseDatabase.getInstance().getReference().child("Ratings").child(currentUserId);
             loadUserDataFromFirebase();
+            loadUserRatingsFromFirebase();
         }
 
         // 3. Listeners
@@ -77,16 +84,15 @@ public class ProfileFragment extends Fragment {
     }
 
     private void loadUserDataFromFirebase() {
+        if (mUserRef == null || userListener != null) return;
+
         // addValueEventListener use kiya hai taake PersonalInfo se change hote hi yahan khud update ho jaye
-        mDatabase.addValueEventListener(new ValueEventListener() {
+        userListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists() && isAdded()) {
                     userName = snapshot.child("name").getValue(String.class);
                     userEmail = snapshot.child("email").getValue(String.class);
-
-                    // Rating default 5.0 set ki hai
-                    String rating = snapshot.hasChild("rating") ? snapshot.child("rating").getValue(String.class) : "5.0 ★";
 
                     // Safe Integer Casting (Long to Int handled)
                     if (snapshot.hasChild("avatarId")) {
@@ -101,7 +107,6 @@ public class ProfileFragment extends Fragment {
                     // Set UI
                     profileName.setText(userName != null ? userName : "SkillSwap User");
                     profileEmail.setText(userEmail != null ? userEmail : "");
-                    profileRating.setText(rating);
                     setAvatar(avatarId);
                 }
             }
@@ -112,7 +117,96 @@ public class ProfileFragment extends Fragment {
                     Toast.makeText(requireContext(), "Database Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        };
+
+        mUserRef.addValueEventListener(userListener);
+    }
+
+    private void loadUserRatingsFromFirebase() {
+        if (mRatingsRef == null || ratingsListener != null) return;
+
+        ratingsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!isAdded()) return;
+
+                if (!snapshot.exists()) {
+                    profileRating.setText(getString(R.string.profile_no_ratings));
+                    return;
+                }
+
+                double total = 0;
+                int count = 0;
+                for (DataSnapshot ratingSnap : snapshot.getChildren()) {
+                    Double ratingValue = parseRatingValue(ratingSnap.child("rating").getValue());
+                    if (ratingValue != null) {
+                        total += ratingValue;
+                        count++;
+                    }
+                }
+
+                if (count == 0) {
+                    profileRating.setText(getString(R.string.profile_no_ratings));
+                    return;
+                }
+
+                double average = total / count;
+                profileRating.setText(String.format(Locale.US, "%.1f ★", average));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                if (isAdded()) {
+                    Toast.makeText(requireContext(), "Ratings Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
+        mRatingsRef.addValueEventListener(ratingsListener);
+    }
+
+    private Double parseRatingValue(Object rawValue) {
+        if (rawValue == null) return null;
+
+        double parsed;
+        if (rawValue instanceof Long) {
+            parsed = ((Long) rawValue).doubleValue();
+        } else if (rawValue instanceof Integer) {
+            parsed = ((Integer) rawValue).doubleValue();
+        } else if (rawValue instanceof Double) {
+            parsed = (Double) rawValue;
+        } else if (rawValue instanceof Float) {
+            parsed = ((Float) rawValue).doubleValue();
+        } else if (rawValue instanceof String) {
+            try {
+                parsed = Double.parseDouble(((String) rawValue).trim());
+            } catch (NumberFormatException ignored) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+
+        if (Double.isNaN(parsed) || Double.isInfinite(parsed) || parsed < 0 || parsed > 5) {
+            return null;
+        }
+
+        return parsed;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        if (mUserRef != null && userListener != null) {
+            mUserRef.removeEventListener(userListener);
+            userListener = null;
+        }
+
+        if (mRatingsRef != null && ratingsListener != null) {
+            mRatingsRef.removeEventListener(ratingsListener);
+            ratingsListener = null;
+        }
     }
 
     private void setAvatar(int id) {

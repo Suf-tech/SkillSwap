@@ -29,16 +29,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RequestAdapter extends BaseAdapter {
+    public enum Mode {
+        ACTIVE,
+        HISTORY
+    }
+
     Context context;
     ArrayList<RequestModel> list;
     String currentUserId;
     DatabaseReference mDatabase;
+    Mode mode;
 
     public RequestAdapter(Context context, ArrayList<RequestModel> list, String currentUserId) {
+        this(context, list, currentUserId, Mode.ACTIVE);
+    }
+
+    public RequestAdapter(Context context, ArrayList<RequestModel> list, String currentUserId, Mode mode) {
         this.context = context;
         this.list = list;
         this.currentUserId = currentUserId;
         this.mDatabase = FirebaseDatabase.getInstance().getReference();
+        this.mode = mode;
     }
 
     @Override
@@ -73,13 +84,13 @@ public class RequestAdapter extends BaseAdapter {
 
         boolean isSender = req.getSenderId() != null && req.getSenderId().equals(currentUserId);
         String otherUserId = isSender ? req.getReceiverId() : req.getSenderId();
-        String currentStatus = req.getStatus() != null ? req.getStatus() : "pending";
+        String currentStatus = req.getStatus() != null ? req.getStatus() : RequestModel.STATUS_PENDING;
 
         status.setText(currentStatus.toUpperCase());
 
-        if(currentStatus.equalsIgnoreCase("Accepted")) status.setTextColor(Color.parseColor("#4CAF50"));
-        else if(currentStatus.equalsIgnoreCase("Completed")) status.setTextColor(Color.parseColor("#9C27B0"));
-        else if(currentStatus.equalsIgnoreCase("Rejected")) status.setTextColor(Color.parseColor("#F44336"));
+        if (RequestModel.STATUS_ACCEPTED.equals(currentStatus)) status.setTextColor(Color.parseColor("#4CAF50"));
+        else if (RequestModel.STATUS_COMPLETED.equals(currentStatus)) status.setTextColor(Color.parseColor("#9C27B0"));
+        else if (RequestModel.STATUS_REJECTED.equals(currentStatus)) status.setTextColor(Color.parseColor("#F44336"));
         else status.setTextColor(Color.parseColor("#FF9800"));
 
         if (isSender) {
@@ -103,38 +114,38 @@ public class RequestAdapter extends BaseAdapter {
         btnComplete.setVisibility(View.GONE);
         btnRate.setVisibility(View.GONE);
 
-        if (currentStatus.equalsIgnoreCase("Accepted")) {
-            actionLayout.setVisibility(View.VISIBLE);
-            btnChat.setVisibility(View.VISIBLE);
-            btnComplete.setVisibility(View.VISIBLE);
-        } else if (currentStatus.equalsIgnoreCase("Completed")) {
-            actionLayout.setVisibility(View.VISIBLE);
-            btnChat.setVisibility(View.GONE); // Chat hidden
+        if (mode == Mode.HISTORY) {
+            if (RequestModel.STATUS_COMPLETED.equals(currentStatus)) {
+                actionLayout.setVisibility(View.VISIBLE);
 
-            // --- RATING ACCESS LOGIC ---
-            // Check if this user has already rated this request
-            mDatabase.child("Ratings").child(otherUserId).child(req.getId())
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.exists()) {
-                                btnRate.setVisibility(View.GONE); // Already rated
-                            } else {
-                                btnRate.setVisibility(View.VISIBLE); // Not rated yet
+                // Completed items stay read-only except rating access.
+                mDatabase.child("Ratings").child(otherUserId).child(req.getId())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                btnRate.setVisibility(snapshot.exists() ? View.GONE : View.VISIBLE);
                             }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {}
-                    });
-        } else if (currentStatus.equalsIgnoreCase("pending") && !isSender) {
-            actionLayout.setVisibility(View.VISIBLE);
-            btnAccept.setVisibility(View.VISIBLE);
-            btnReject.setVisibility(View.VISIBLE);
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {}
+                        });
+            }
+        } else {
+            if (RequestModel.STATUS_ACCEPTED.equals(currentStatus)) {
+                actionLayout.setVisibility(View.VISIBLE);
+                btnChat.setVisibility(View.VISIBLE);
+                btnComplete.setVisibility(View.VISIBLE);
+                btnReject.setVisibility(View.VISIBLE); // Reject is allowed after accepted as a failure state.
+            } else if (RequestModel.STATUS_PENDING.equals(currentStatus) && !isSender) {
+                actionLayout.setVisibility(View.VISIBLE);
+                btnAccept.setVisibility(View.VISIBLE);
+                btnReject.setVisibility(View.VISIBLE);
+            }
         }
 
         // --- LISTENERS ---
-        btnAccept.setOnClickListener(v -> updateStatus(req.getId(), "Accepted", req.getPostId()));
-        btnReject.setOnClickListener(v -> updateStatus(req.getId(), "Rejected", null));
+        btnAccept.setOnClickListener(v -> updateStatus(req, RequestModel.STATUS_ACCEPTED));
+        btnReject.setOnClickListener(v -> updateStatus(req, RequestModel.STATUS_REJECTED));
 
         btnChat.setOnClickListener(v -> {
             Intent intent = new Intent(context, ChatActivity.class);
@@ -144,7 +155,7 @@ public class RequestAdapter extends BaseAdapter {
             context.startActivity(intent);
         });
 
-        btnComplete.setOnClickListener(v -> updateStatus(req.getId(), "Completed", null));
+        btnComplete.setOnClickListener(v -> updateStatus(req, RequestModel.STATUS_COMPLETED));
 
         btnRate.setOnClickListener(v -> showRatingDialog(req));
 
@@ -173,6 +184,12 @@ public class RequestAdapter extends BaseAdapter {
 
             String targetUserId = currentUserId.equals(req.getSenderId()) ? req.getReceiverId() : req.getSenderId();
             String myName = currentUserId.equals(req.getSenderId()) ? req.getSenderName() : req.getReceiverName();
+            String requestId = req.getId();
+
+            if (targetUserId == null || targetUserId.trim().isEmpty() || requestId == null || requestId.trim().isEmpty()) {
+                Toast.makeText(context, "Unable to submit rating for this request", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             HashMap<String, Object> ratingMap = new HashMap<>();
             ratingMap.put("rating", ratingValue);
@@ -181,27 +198,31 @@ public class RequestAdapter extends BaseAdapter {
             ratingMap.put("fromId", currentUserId);
             ratingMap.put("timestamp", System.currentTimeMillis());
 
-            mDatabase.child("Ratings").child(targetUserId).child(req.getId()).setValue(ratingMap)
+            mDatabase.child("Ratings").child(targetUserId).child(requestId).setValue(ratingMap)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(context, "Rating Submitted!", Toast.LENGTH_SHORT).show();
                         // Refresh the list to hide the rate button immediately
                         notifyDataSetChanged();
                         dialog.dismiss();
-                    });
+                    })
+                    .addOnFailureListener(e -> Toast.makeText(context, "Rating failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
         });
         dialog.show();
     }
 
-    private void updateStatus(String requestId, String newStatus, String postId) {
+    private void updateStatus(RequestModel req, String newStatus) {
+        if (req == null) return;
+        String requestId = req.getId();
         if (requestId == null) return;
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("status", newStatus);
+        updates.put("timestamp", System.currentTimeMillis());
 
         mDatabase.child("Requests").child(requestId).updateChildren(updates).addOnSuccessListener(aVoid -> {
-            if (newStatus.equalsIgnoreCase("Accepted")) {
-                if (postId != null) {
-                    mDatabase.child("Posts").child(postId).child("isOpen").setValue(false);
+            if (RequestModel.STATUS_ACCEPTED.equals(newStatus)) {
+                if (req.getPostId() != null) {
+                    mDatabase.child("Posts").child(req.getPostId()).child("isOpen").setValue(false);
                 }
 
                 // Close all other posts for the current user too

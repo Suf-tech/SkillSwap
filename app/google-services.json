@@ -13,7 +13,36 @@
           "package_name": "com.example.skillswap"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "123004834471-5bnbk4qtv6ehcp1fctm239jtkiii20ql.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.skillswap",
+            "certificate_hash": "7fa8d24b314dc24d245ddd0e58b633a04005dbd3"
+          }
+        },
+        {
+          "client_id": "123004834471-9klvolev5v1ifn1gbj9tfl7vqocqqmhc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.skillswap",
+            "certificate_hash": "6f2e23aa0d275c9a47f2837eb5f6921f2a2211af"
+          }
+        },
+        {
+          "client_id": "123004834471-l7hhcsebemaecebagek5b52iodg3lvku.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.skillswap",
+            "certificate_hash": "b67ea3a4f0e5acb3c03c341290a084ca988f100d"
+          }
+        },
+        {
+          "client_id": "123004834471-a0usvgt0fo3eki3bp6c5nn47aifbaopf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC0F5IoPap4sjBoXTBDCOOXRbynrqXBtS0"
@@ -21,7 +50,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "123004834471-a0usvgt0fo3eki3bp6c5nn47aifbaopf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

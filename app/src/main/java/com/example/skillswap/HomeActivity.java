@@ -49,7 +49,7 @@ public class HomeActivity extends AppCompatActivity {
             viewPager = findViewById(R.id.viewPager);
             ViewPagerAdapter adapter = new ViewPagerAdapter(this);
             viewPager.setAdapter(adapter);
-            viewPager.setOffscreenPageLimit(3);
+            viewPager.setOffscreenPageLimit(4);
 
             // 4. Bottom Navigation Setup
             bottomNav = findViewById(R.id.bottomNavigation);
@@ -68,6 +68,9 @@ public class HomeActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_profile) {
                     viewPager.setCurrentItem(3, true);
                     updateToolbarTitle("My Profile");
+                } else if (id == R.id.nav_history) {
+                    viewPager.setCurrentItem(4, true);
+                    updateToolbarTitle("History");
                 } else if (id == R.id.nav_logout) {
                     handleLogout();
                     return false;
@@ -80,14 +83,32 @@ public class HomeActivity extends AppCompatActivity {
                 @Override
                 public void onPageSelected(int position) {
                     super.onPageSelected(position);
-                    if (position < 4) {
-                        bottomNav.getMenu().getItem(position).setChecked(true);
+                    if (position < 5) {
+                        int selectedNavId;
                         switch (position) {
-                            case 0: updateToolbarTitle("Dashboard"); break;
-                            case 1: updateToolbarTitle("Swap Requests"); break;
-                            case 2: updateToolbarTitle("Create Post"); break;
-                            case 3: updateToolbarTitle("My Profile"); break;
+                            case 0:
+                                selectedNavId = R.id.nav_home;
+                                updateToolbarTitle("Dashboard");
+                                break;
+                            case 1:
+                                selectedNavId = R.id.nav_requests;
+                                updateToolbarTitle("Swap Requests");
+                                break;
+                            case 2:
+                                selectedNavId = R.id.nav_add;
+                                updateToolbarTitle("Create Post");
+                                break;
+                            case 3:
+                                selectedNavId = R.id.nav_profile;
+                                updateToolbarTitle("My Profile");
+                                break;
+                            case 4:
+                            default:
+                                selectedNavId = R.id.nav_history;
+                                updateToolbarTitle("History");
+                                break;
                         }
+                        bottomNav.setSelectedItemId(selectedNavId);
                     }
                 }
             });

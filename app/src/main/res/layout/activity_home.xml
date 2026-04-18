@@ -25,7 +25,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#F5F5F5"
+        android:elevation="8dp"
+        app:itemIconSize="22dp"
+        app:itemRippleColor="#22000000"
         app:itemIconTint="@color/nav_item_color_state"
+        app:labelVisibilityMode="labeled"
         app:itemTextColor="@color/nav_item_color_state"
         app:menu="@menu/bottom_nav_menu" />
 

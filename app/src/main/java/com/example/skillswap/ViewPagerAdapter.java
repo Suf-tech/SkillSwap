@@ -24,6 +24,8 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
                 return new AddPostFragment();
             case 3:
                 return new ProfileFragment();
+            case 4:
+                return new HistoryFragment();
             default:
                 return new HomeFragment();
         }
@@ -31,6 +33,6 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 4; // We have 4 swipeable tabs (Logout is handled separately)
+        return 5; // Home, Requests, Add Post, Profile, History (Logout is action-only)
     }
 }
