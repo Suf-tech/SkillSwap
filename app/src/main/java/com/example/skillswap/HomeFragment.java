@@ -36,7 +36,8 @@ public class HomeFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup
+            container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child("Posts");
@@ -89,7 +90,8 @@ public class HomeFragment extends Fragment {
                             }
 
                             // Only add if post is OPEN and teacher name is valid
-                            if (isOpen && skill.getTeacher() != null && !skill.getTeacher().equals("Unknown User")) {
+                            if (isOpen && skill.getTeacher() != null &&
+                                    !skill.getTeacher().equals("Unknown User")) {
                                 skillList.add(skill);
                             }
                         }

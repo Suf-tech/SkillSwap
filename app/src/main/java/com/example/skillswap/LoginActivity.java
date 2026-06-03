@@ -13,24 +13,38 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+
 public class LoginActivity extends AppCompatActivity {
 
-    // XML IDs: email, password, loginBtn, signupText, forgetPass
     private EditText email;
-    private TextInputEditText password; // XML mein TextInputEditText hai
-    private Button loginBtn;
+    private TextInputEditText password;
+    private Button loginBtn, googleBtn;
     private TextView signupText, forgetPass;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
+
+    // --- GOOGLE LOGIN VARIABLES ---
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final int RC_SIGN_IN = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,17 +55,25 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        // 2. Bind Views (Sync with XML)
+        // 2. Bind Views
         email = findViewById(R.id.email);
-        password = findViewById(R.id.password); // ID matches TextInputEditText
+        password = findViewById(R.id.password);
         loginBtn = findViewById(R.id.loginBtn);
+        googleBtn = findViewById(R.id.googleBtn);
         signupText = findViewById(R.id.signupText);
         forgetPass = findViewById(R.id.forgetPass);
 
-        // Note: ProgressBar XML mein nahi hai, isliye isay remove ya add karna hoga.
-        // Crash se bachne ke liye maine progress logic handle kar liya hai.
+        // --- 3. GOOGLE SIGN-IN SETUP ---
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
 
-        // 3. Login Button Click
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        googleBtn.setOnClickListener(v -> signInWithGoogle());
+
+        // 4. Email/Password Login Button Click
         loginBtn.setOnClickListener(v -> {
             String inputEmail = email.getText().toString().trim();
             String inputPass = password.getText().toString().trim();
@@ -61,13 +83,11 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            // --- ADMIN LOGIN CHECK ---
             if (inputEmail.equalsIgnoreCase("admin@skillswap.com") && inputPass.equals("admin123")) {
                 handleAdminLogin();
                 return;
             }
 
-            // --- USER LOGIN VIA DATABASE ---
             loginViaDatabase(inputEmail, inputPass);
         });
 
@@ -75,8 +95,70 @@ public class LoginActivity extends AppCompatActivity {
         forgetPass.setOnClickListener(v -> startActivity(new Intent(this, ForgetPasswordActivity.class)));
     }
 
+    // --- GOOGLE SIGN-IN METHODS ---
+    private void signInWithGoogle() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account.getIdToken());
+            } catch (ApiException e) {
+                Toast.makeText(this, "Google Sign-In Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        mAuth.signInWithCredential(credential).addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                FirebaseUser user = mAuth.getCurrentUser();
+                if (user != null) {
+                    syncGoogleUserToDatabase(user);
+                }
+            } else {
+                Toast.makeText(LoginActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void syncGoogleUserToDatabase(FirebaseUser user) {
+        mDatabase.child("Users").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    HashMap<String, Object> userMap = new HashMap<>();
+                    userMap.put("name", user.getDisplayName());
+                    userMap.put("email", user.getEmail());
+                    userMap.put("uid", user.getUid());
+                    userMap.put("avatarId", 0);
+                    userMap.put("needsReset", false);
+
+                    mDatabase.child("Users").child(user.getUid()).setValue(userMap);
+                }
+
+                saveUserSession(user.getUid(), user.getEmail());
+                Toast.makeText(LoginActivity.this, "Signed in as " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    // --- EXISTING LOGIN METHODS ---
     private void loginViaDatabase(String inputEmail, String inputPass) {
-        // XML mein progressBar nahi hai, isliye logic normal rakha hai
         loginBtn.setEnabled(false);
         loginBtn.setText("Logging in...");
 
@@ -94,16 +176,10 @@ public class LoginActivity extends AppCompatActivity {
                                 Boolean needsReset = userSnap.child("needsReset").getValue(Boolean.class);
 
                                 if (dbPassword != null && dbPassword.equals(inputPass)) {
-
-                                    // Step A: Session Save
                                     saveUserSession(userId, inputEmail);
-
-                                    // Step B: Firebase Auth background sync
                                     mAuth.signInWithEmailAndPassword(inputEmail, inputPass);
 
-                                    // Step C: Check if Admin forced a password reset
                                     if (Boolean.TRUE.equals(needsReset)) {
-                                        Toast.makeText(LoginActivity.this, "Reset required by Admin", Toast.LENGTH_LONG).show();
                                         Intent resetIntent = new Intent(LoginActivity.this, CreateNewPasswordActivity.class);
                                         startActivity(resetIntent);
                                     } else {
@@ -126,7 +202,6 @@ public class LoginActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError error) {
                         loginBtn.setEnabled(true);
                         loginBtn.setText("Login");
-                        Toast.makeText(LoginActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -141,11 +216,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void handleAdminLogin() {
-        // Admin Session
         SharedPreferences sp = getSharedPreferences("UserSession", MODE_PRIVATE);
         sp.edit().putBoolean("isLoggedIn", true).putString("role", "admin").apply();
-
-        Toast.makeText(this, "Welcome Admin!", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

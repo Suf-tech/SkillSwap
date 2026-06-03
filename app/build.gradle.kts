@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
-
 }
 
 android {
@@ -40,6 +39,10 @@ dependencies {
     // Firebase Auth aur Database
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-database")
+
+    // --- NAYI DEPENDENCY GOOGLE LOGIN KE LIYE (YE MISSING THI) ---
+    implementation("com.google.android.gms:play-services-auth:21.1.1")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
