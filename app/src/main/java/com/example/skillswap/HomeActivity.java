@@ -68,6 +68,9 @@ public class HomeActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_profile) {
                     viewPager.setCurrentItem(3, true);
                     updateToolbarTitle("My Profile");
+                } else if (id == R.id.nav_history) {
+                    viewPager.setCurrentItem(4, true);
+                    updateToolbarTitle("History");
                 } else if (id == R.id.nav_logout) {
                     handleLogout();
                     return false;
@@ -80,13 +83,14 @@ public class HomeActivity extends AppCompatActivity {
                 @Override
                 public void onPageSelected(int position) {
                     super.onPageSelected(position);
-                    if (position < 4) {
+                    if (position < 5) {
                         bottomNav.getMenu().getItem(position).setChecked(true);
                         switch (position) {
                             case 0: updateToolbarTitle("Dashboard"); break;
                             case 1: updateToolbarTitle("Swap Requests"); break;
                             case 2: updateToolbarTitle("Create Post"); break;
                             case 3: updateToolbarTitle("My Profile"); break;
+                            case 4: updateToolbarTitle("History"); break;
                         }
                     }
                 }

@@ -64,8 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:orientation="horizontal"
-            android:weightSum="2">
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnAccept"
@@ -105,7 +104,7 @@
                 android:layout_marginStart="5dp"
                 android:backgroundTint="#9C27B0"
                 android:textColor="#FFFFFF"
-                android:text="Complete Swap" />
+                android:text="Finish" />
 
             <Button
                 android:id="@+id/btnRate"
